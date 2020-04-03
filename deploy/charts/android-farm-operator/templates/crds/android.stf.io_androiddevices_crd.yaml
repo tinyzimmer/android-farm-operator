@@ -1,0 +1,444 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: androiddevices.android.stf.io
+spec:
+  group: android.stf.io
+  names:
+    kind: AndroidDevice
+    listKind: AndroidDeviceList
+    plural: androiddevices
+    singular: androiddevice
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: AndroidDevice is the Schema for the androiddevices API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: AndroidDeviceSpec defines the desired state of AndroidDevice
+          properties:
+            configRef:
+              description: A reference to an AndroidDeviceConfig to use for the emulators
+                in this group.
+              properties:
+                name:
+                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    TODO: Add other useful fields. apiVersion, kind, uid?'
+                  type: string
+              type: object
+            deviceConfig:
+              description: Any overrides to the config represented by the ConfigRef.
+                Any values supplied here will be merged into the found AndroidDeviceConfig,
+                with fields in this object taking precedence over existing ones in
+                the AndroidDeviceConfig.
+              properties:
+                adbPort:
+                  description: The ADB port that the emulator listens on. Defaults
+                    to 5555. A sidecar will be spawned within emulator pods that redirects
+                    external traffic to this port.
+                  format: int32
+                  type: integer
+                args:
+                  description: Any arguments to pass to the above command.
+                  items:
+                    type: string
+                  type: array
+                command:
+                  description: An optional command to run when starting an emulator
+                    image
+                  items:
+                    type: string
+                  type: array
+                dockerImage:
+                  description: The docker image to use for emulator devices
+                  type: string
+                extraEnvVars:
+                  description: Extra environment variables to supply to the emulator
+                    pods.
+                  items:
+                    description: EnvVar represents an environment variable present
+                      in a Container.
+                    properties:
+                      name:
+                        description: Name of the environment variable. Must be a C_IDENTIFIER.
+                        type: string
+                      value:
+                        description: 'Variable references $(VAR_NAME) are expanded
+                          using the previous defined environment variables in the
+                          container and any service environment variables. If a variable
+                          cannot be resolved, the reference in the input string will
+                          be unchanged. The $(VAR_NAME) syntax can be escaped with
+                          a double $$, ie: $$(VAR_NAME). Escaped references will never
+                          be expanded, regardless of whether the variable exists or
+                          not. Defaults to "".'
+                        type: string
+                      valueFrom:
+                        description: Source for the environment variable's value.
+                          Cannot be used if value is not empty.
+                        properties:
+                          configMapKeyRef:
+                            description: Selects a key of a ConfigMap.
+                            properties:
+                              key:
+                                description: The key to select.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  TODO: Add other useful fields. apiVersion, kind,
+                                  uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the ConfigMap or its
+                                  key must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          fieldRef:
+                            description: 'Selects a field of the pod: supports metadata.name,
+                              metadata.namespace, metadata.labels, metadata.annotations,
+                              spec.nodeName, spec.serviceAccountName, status.hostIP,
+                              status.podIP.'
+                            properties:
+                              apiVersion:
+                                description: Version of the schema the FieldPath is
+                                  written in terms of, defaults to "v1".
+                                type: string
+                              fieldPath:
+                                description: Path of the field to select in the specified
+                                  API version.
+                                type: string
+                            required:
+                            - fieldPath
+                            type: object
+                          resourceFieldRef:
+                            description: 'Selects a resource of the container: only
+                              resources limits and requests (limits.cpu, limits.memory,
+                              limits.ephemeral-storage, requests.cpu, requests.memory
+                              and requests.ephemeral-storage) are currently supported.'
+                            properties:
+                              containerName:
+                                description: 'Container name: required for volumes,
+                                  optional for env vars'
+                                type: string
+                              divisor:
+                                description: Specifies the output format of the exposed
+                                  resources, defaults to "1"
+                                type: string
+                              resource:
+                                description: 'Required: resource to select'
+                                type: string
+                            required:
+                            - resource
+                            type: object
+                          secretKeyRef:
+                            description: Selects a key of a secret in the pod's namespace
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must
+                                  be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  TODO: Add other useful fields. apiVersion, kind,
+                                  uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key
+                                  must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  type: array
+                extraPorts:
+                  description: Extra port mappings to apply to the emulator pods.
+                  items:
+                    description: ContainerPort represents a network port in a single
+                      container.
+                    properties:
+                      containerPort:
+                        description: Number of port to expose on the pod's IP address.
+                          This must be a valid port number, 0 < x < 65536.
+                        format: int32
+                        type: integer
+                      hostIP:
+                        description: What host IP to bind the external port to.
+                        type: string
+                      hostPort:
+                        description: Number of port to expose on the host. If specified,
+                          this must be a valid port number, 0 < x < 65536. If HostNetwork
+                          is specified, this must match ContainerPort. Most containers
+                          do not need this.
+                        format: int32
+                        type: integer
+                      name:
+                        description: If specified, this must be an IANA_SVC_NAME and
+                          unique within the pod. Each named port in a pod must have
+                          a unique name. Name for the port that can be referred to
+                          by services.
+                        type: string
+                      protocol:
+                        description: Protocol for port. Must be UDP, TCP, or SCTP.
+                          Defaults to "TCP".
+                        type: string
+                    required:
+                    - containerPort
+                    type: object
+                  type: array
+                imagePullPolicy:
+                  description: The pull policy to use for emulator pods
+                  type: string
+                imagePullSecrets:
+                  description: Pull secrets required for the docker image.
+                  items:
+                    description: LocalObjectReference contains enough information
+                      to let you locate the referenced object inside the same namespace.
+                    properties:
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                    type: object
+                  type: array
+                kvmEnabled:
+                  description: Whether to mount the kvm device to the pods, will require
+                    that the operator can launch privileged pods.
+                  type: boolean
+                resources:
+                  description: Resource restraints to place on the emulators.
+                  properties:
+                    limits:
+                      additionalProperties:
+                        type: string
+                      description: 'Limits describes the maximum amount of compute
+                        resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      type: object
+                    requests:
+                      additionalProperties:
+                        type: string
+                      description: 'Requests describes the minimum amount of compute
+                        resources required. If Requests is omitted for a container,
+                        it defaults to Limits if that is explicitly specified, otherwise
+                        to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      type: object
+                  type: object
+                startupJobTemplates:
+                  description: 'A list of AndroidJobTemplates to execute against new
+                    instances. TODO: Very very very beta'
+                  items:
+                    type: string
+                  type: array
+                tcpRedir:
+                  description: Configuration for the tcp redirection side car
+                  properties:
+                    enabled:
+                      description: Whether to run a sidecar with emulator pods that
+                        redirects TCP traffic on the adb port to the emulator adb
+                        server listening on the loopback interface. This is required
+                        for the image used in this repository, but if you are using
+                        an image that exposes ADB on all interfaces itself, this is
+                        not required.
+                      type: boolean
+                    image:
+                      description: Image is the repository to download the image from.
+                        Defaults to quay.io/tinyzimmer/goredir whose source is in
+                        this repository.
+                      type: string
+                    imagePullPolicy:
+                      description: The pull policy to attach to deployments using
+                        this image.
+                      type: string
+                    imagePullSecrets:
+                      description: Any pull secrets required for downloading the image.
+                      items:
+                        description: LocalObjectReference contains enough information
+                          to let you locate the referenced object inside the same
+                          namespace.
+                        properties:
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                        type: object
+                      type: array
+                  type: object
+                volumes:
+                  description: A list of volume configurations to apply to the emulator
+                    pods.
+                  items:
+                    description: Volume represents a volume configuration for the
+                      emulator.
+                    properties:
+                      mountPoint:
+                        description: Where to mount the volume in emulator pods.
+                        type: string
+                      pvcSpec:
+                        description: A PVC spec to use for creating the emulator volumes.
+                        properties:
+                          accessModes:
+                            description: 'AccessModes contains the desired access
+                              modes the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                            items:
+                              type: string
+                            type: array
+                          dataSource:
+                            description: This field requires the VolumeSnapshotDataSource
+                              alpha feature gate to be enabled and currently VolumeSnapshot
+                              is the only supported data source. If the provisioner
+                              can support VolumeSnapshot data source, it will create
+                              a new volume and data will be restored to the volume
+                              at the same time. If the provisioner does not support
+                              VolumeSnapshot data source, volume will not be created
+                              and the failure will be reported as an event. In the
+                              future, we plan to support more data source types and
+                              the behavior of the provisioner may change.
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                          resources:
+                            description: 'Resources represents the minimum resources
+                              the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                            properties:
+                              limits:
+                                additionalProperties:
+                                  type: string
+                                description: 'Limits describes the maximum amount
+                                  of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  type: string
+                                description: 'Requests describes the minimum amount
+                                  of compute resources required. If Requests is omitted
+                                  for a container, it defaults to Limits if that is
+                                  explicitly specified, otherwise to an implementation-defined
+                                  value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                            type: object
+                          selector:
+                            description: A label query over volumes to consider for
+                              binding.
+                            properties:
+                              matchExpressions:
+                                description: matchExpressions is a list of label selector
+                                  requirements. The requirements are ANDed.
+                                items:
+                                  description: A label selector requirement is a selector
+                                    that contains values, a key, and an operator that
+                                    relates the key and values.
+                                  properties:
+                                    key:
+                                      description: key is the label key that the selector
+                                        applies to.
+                                      type: string
+                                    operator:
+                                      description: operator represents a key's relationship
+                                        to a set of values. Valid operators are In,
+                                        NotIn, Exists and DoesNotExist.
+                                      type: string
+                                    values:
+                                      description: values is an array of string values.
+                                        If the operator is In or NotIn, the values
+                                        array must be non-empty. If the operator is
+                                        Exists or DoesNotExist, the values array must
+                                        be empty. This array is replaced during a
+                                        strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                              matchLabels:
+                                additionalProperties:
+                                  type: string
+                                description: matchLabels is a map of {key,value} pairs.
+                                  A single {key,value} in the matchLabels map is equivalent
+                                  to an element of matchExpressions, whose key field
+                                  is "key", the operator is "In", and the values array
+                                  contains only "value". The requirements are ANDed.
+                                type: object
+                            type: object
+                          storageClassName:
+                            description: 'Name of the StorageClass required by the
+                              claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                            type: string
+                          volumeMode:
+                            description: volumeMode defines what type of volume is
+                              required by the claim. Value of Filesystem is implied
+                              when not included in claim spec. This is a beta feature.
+                            type: string
+                          volumeName:
+                            description: VolumeName is the binding reference to the
+                              PersistentVolume backing this claim.
+                            type: string
+                        type: object
+                      volumePrefix:
+                        description: A prefix to apply to PVCs created for devices
+                          using this configuration.
+                        type: string
+                    required:
+                    - mountPoint
+                    - pvcSpec
+                    - volumePrefix
+                    type: object
+                  type: array
+              type: object
+            hostname:
+              description: A hostname to apply to the device (used by AndroidFarm
+                controller)
+              type: string
+            subdomain:
+              description: A subdomain to apply to the device (used by AndroidFarm
+                controller)
+              type: string
+          type: object
+        status:
+          description: AndroidDeviceStatus defines the observed state of AndroidDevice
+          properties:
+            state:
+              type: string
+          required:
+          - state
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

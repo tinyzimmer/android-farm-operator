@@ -1,0 +1,36 @@
+# Compile image
+FROM golang:1.14-alpine as builder
+
+RUN apk --update add upx
+
+# Setup build directory
+RUN mkdir -p /build
+WORKDIR /build
+
+# Go build options
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
+
+# Copy module files
+COPY go.mod /build/go.mod
+COPY go.sum /build/go.sum
+
+# Copy go code
+COPY version/ /build/version
+COPY cmd/     /build/cmd
+COPY pkg/     /build/pkg
+
+# Build the binary
+RUN go build -o /tmp/adbmon ./cmd/adbmon && upx /tmp/adbmon
+
+FROM alpine
+
+ARG ANDROID_TOOLS_VERSION=29.0.6-r0
+RUN apk --update-cache \
+  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  add android-tools==${ANDROID_TOOLS_VERSION}
+
+# Install adb-mon binary
+COPY --from=builder /tmp/adbmon /usr/local/bin/adbmon
+
+ENTRYPOINT ["/usr/local/bin/adbmon"]

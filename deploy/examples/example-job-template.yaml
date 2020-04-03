@@ -1,0 +1,26 @@
+---
+apiVersion: android.stf.io/v1alpha1
+kind: AndroidJobTemplate
+metadata:
+  name: example-job-template
+spec:
+  # WIP
+  actions:
+    - activity: Command
+      runAsRoot: true
+      commands:
+        # Commands are templated with metadata about the device
+        - "echo {{ .Name }} > /sdcard/emulator.txt"
+
+    ## Not implemented yet
+    # - activity: Install
+    #   name: com.myapp
+    #   apkURL: https://example.com/myapp.apk
+    #
+    # - activity: Launch
+    #   name: com.myapp
+    #
+    # - activity: Tap
+    #   selector:
+    #     atString: OK
+    #

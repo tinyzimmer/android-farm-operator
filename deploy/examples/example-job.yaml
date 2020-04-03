@@ -1,0 +1,11 @@
+---
+apiVersion: android.stf.io/v1alpha1
+kind: AndroidJob
+metadata:
+  name: example-job
+spec:
+  ## WIP
+  deviceSelector:
+    deviceGroup: example-emulators
+  jobTemplate: example-job-template
+  ttlSecondsAfterCreation: 300

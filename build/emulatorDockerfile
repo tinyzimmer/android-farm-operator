@@ -1,0 +1,41 @@
+FROM openjdk:11-slim-buster
+
+ENV ANDROID_HOME "/opt/sdk"
+ENV PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+
+# Install required dependencies
+RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install \
+    bash git unzip wget redir qemu-utils procps iproute2 \
+    libx11-dev libpulse-dev libnss3 libxcomposite-dev libxcursor-dev libxi-dev \
+    libxtst-dev uuid-dev libgl-dev libasound-dev libxcb1-dev && \
+    apt-get -y autoremove && apt-get clean autoclean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and extract Android Tools
+ARG CLI_TOOLS_VERSION=6200805
+RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-${CLI_TOOLS_VERSION}_latest.zip -O /tmp/tools.zip && \
+    mkdir -p ${ANDROID_HOME} && \
+    unzip -qq /tmp/tools.zip -d ${ANDROID_HOME} && \
+    rm -v /tmp/tools.zip
+
+# Install SDK Packages
+ARG PLATFORM=android-29
+RUN mkdir -p ~/.android/ && touch ~/.android/repositories.cfg && \
+    yes | ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses && \
+    ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --update && \
+    ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} emulator "system-images;${PLATFORM};google_apis;x86_64" platform-tools "platforms;${PLATFORM}" && \
+    # Compress downloaded system.img
+    echo "Converting system.img to qcow2" && \
+    qemu-img convert -O qcow2 -c ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/system.img ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/system.qcow2 && \
+    mv ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/system.qcow2 ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/system.img && \
+    # Compress downloaded userdata.img
+    echo "Converting userdata.img to qcow2" && \
+    qemu-img convert -O qcow2 -c ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/userdata.img ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/userdata.qcow2 && \
+    mv ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/userdata.qcow2 ${ANDROID_HOME}/system-images/${PLATFORM}/google_apis/x86_64/userdata.img
+
+ARG APP_DIR=build/apps
+COPY ${APP_DIR} /opt/sdk/apps
+COPY build/start.sh /opt/sdk/start.sh
+RUN chmod +x /opt/sdk/start.sh && sed -i "s:!platform!:${PLATFORM}:" /opt/sdk/start.sh
+
+CMD /opt/sdk/start.sh

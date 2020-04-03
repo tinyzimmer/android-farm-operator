@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: stf-secrets
+data:
+  stf-secret: c3VwZXJkdXBlcnNlY3JldA==
+---
+apiVersion: android.stf.io/v1alpha1
+kind: AndroidFarm
+metadata:
+# The name of our AndroidFarm - Farms are cluster-scoped. Their resources
+# get namespaced by stf and device group configurations below.
+  name: example-androidfarm
+# Most of the definitions in the below spec are the same as their defaults,
+# however, stated explicitly for documentation purposes.
+spec:
+  # Global device management policy that will apply to all groups and only
+  # allow one emulated device to be booting at a time
+  deviceManagementPolicy:
+    # Only allow x boots at a time, in numerical order. This is currently the only
+    # supported policy.
+    podManagementPolicy: OrderedReady
+    # Only allow one device to be booting at a time - larger bare metal clusters
+    # can handle higher concurrency, but the android boot process is very cpu
+    # intensive.
+    concurrency: 1
+  # Configurations for STF. Examples assume that both traefik.kind.local and
+  # stf.kind.local resolve to a metallb instance on a local kind cluster.
+  stfConfig:
+    # Run STF resources in the default namespace
+    namespace: default
+    # STF services will be configured to advertise this address as their source.
+    # THe main STF console will be available on this address, and the rethinkdb
+    # admin console will be served at the path /rethinkdb/.
+    # TODO: rethinkdb-admin auth options
+    appHostname: "stf.kind.local"
+    # The secret above with our application secret
+    secret: stf-secrets
+    # Use privileged pods (a lot of the images in use run as root - this needs to be adapted)
+    privilegedDeployments: true
+    # STF Image to use
+    stfImage:
+      # The recent latest image works best and doesn't run as root. I need to go back
+      # on the privilegedDeployments stuff and clean up container security contexts.
+      image: openstf/stf:latest
+      imagePullPolicy: IfNotPresent
+    # ADB configuration options
+    adb:
+      # Source for this image is in this repository - it runs an ADB server in the
+      # background while performing some STF maintenance and auto-healing. Override
+      # with your own image if you'd like.
+      image: quay.io/tinyzimmer/adbmon:latest
+    # RethinkDB Configuration
+    rethinkdb:
+      # Run two replicas per shard
+      replicas: 2
+      # Use single sharded tables
+      shards: 1
+    # Run a single rethinkdb proxy instance
+    rethinkdbProxy:
+      replicas: 1
+    # Use mock authentication
+    auth:
+      mock: true
+    # Set up the traefik dashboard
+    traefik:
+      # Run a traefik deployment. Services, ports, and routing rules are dynamically
+      # configured to serve the needs of the AndroidFarm's state. You can run
+      # it as an external LoadBalancer (the default configuration) and use the
+      # SSL options above. Or, if you are using `ssl.external`, you can route
+      # the `appHostname` from your point of ssl termination to this traefik instance.
+      #
+      # Provider ports are exposed through the traefik instance as well, however, it is not
+      # possible to encrypt the ADB traffic. If you do not want to expose those ports at all,
+      # for now you should run this deployment as a ClusterIP service and set up an additional
+      # proxy on the edge of your cluster.
+      # TODO: Allow to disable exposing adb on the deviceGroup level
+      deployment:
+        # Enable access logs
+        accessLogs: true
+        # Enable the dashboard
+        dashboard:
+          # The overlapping /api paths with stf require for now that we serve
+          # traefik dashboard at a seperate hostname than STF.
+          host: "traefik.kind.local"
+      # Set up self-signed tls
+      tls: {}
+  # Device groups - Each group gets a dedicated provider and adb server
+  deviceGroups:
+
+    # A device group watching for USB devices on the `kind-worker` node
+    - name: usb-devices
+      # Provider resources for this group will get placed in the STF namespace
+      # configured above.
+      provider:
+        startPort: 16000
+      # Use the host USB device on `kind-worker` for this group
+      hostUSB:
+        nodeName: kind-worker
+
+      # A device group with 1 emulator using the example-config
+    - name: emulators
+      # STF provider configuration overrides
+      provider:
+        # Start port defaults to 15000 automatically and you'll need to make
+        # sure it doesn't overlap with other groups. (~4 ports per device)
+        startPort: 15000
+        # Advertise ADB ports from their cluster local address. Useful if you want
+        # to run a VPN into the cluster to encrypt ADB traffic. Defaults to advertising
+        # the appHostname above.
+        clusterLocalADB: true
+        # Persist device state between user sessions in OpenSTF.
+        persistDeviceState: true
+      # Run emulated devices in this group
+      emulators:
+        # Run emulators in the default namespace
+        namespace: default
+        # Run a single emulator
+        count: 1
+        # Base these devices off the `example-config` AndroidDeviceConfig.
+        configRef:
+          name: example-config
+        # Configuration overrides - See AndroidDeviceConfig
+        deviceConfig: {}
+        # if a hostname and subdomain are not used - devices will be known in STF
+        # by their cluster IP address
+        hostnameTemplate: "example-{{ .Index }}"
+        subdomain: devices

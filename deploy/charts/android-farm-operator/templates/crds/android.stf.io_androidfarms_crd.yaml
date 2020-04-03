@@ -1,0 +1,1366 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: androidfarms.android.stf.io
+spec:
+  group: android.stf.io
+  names:
+    kind: AndroidFarm
+    listKind: AndroidFarmList
+    plural: androidfarms
+    singular: androidfarm
+  scope: Cluster
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: AndroidFarm is the Schema for the androidfarms API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: AndroidFarmSpec defines the desired state of AndroidFarm
+          properties:
+            deviceGroups:
+              description: A list of device groups and their configurations to run
+                on the cluster
+              items:
+                description: DeviceGroup represents a collection of android devices
+                  that share a common configuration.
+                properties:
+                  emulators:
+                    description: A configuration for emulated devices running in pods
+                      on the kubernetes cluster
+                    properties:
+                      configRef:
+                        description: A reference to an AndroidDeviceConfig to use
+                          for the emulators in this group.
+                        properties:
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                        type: object
+                      count:
+                        description: The number of devices to run in the group. Defaults
+                          to no devices.
+                        format: int32
+                        type: integer
+                      deviceConfig:
+                        description: Any overrides to the config represented by the
+                          ConfigRef. Any values supplied here will be merged into
+                          the found AndroidDeviceConfig, with fields in this object
+                          taking precedence over existing ones in the AndroidDeviceConfig.
+                        properties:
+                          adbPort:
+                            description: The ADB port that the emulator listens on.
+                              Defaults to 5555. A sidecar will be spawned within emulator
+                              pods that redirects external traffic to this port.
+                            format: int32
+                            type: integer
+                          args:
+                            description: Any arguments to pass to the above command.
+                            items:
+                              type: string
+                            type: array
+                          command:
+                            description: An optional command to run when starting
+                              an emulator image
+                            items:
+                              type: string
+                            type: array
+                          dockerImage:
+                            description: The docker image to use for emulator devices
+                            type: string
+                          extraEnvVars:
+                            description: Extra environment variables to supply to
+                              the emulator pods.
+                            items:
+                              description: EnvVar represents an environment variable
+                                present in a Container.
+                              properties:
+                                name:
+                                  description: Name of the environment variable. Must
+                                    be a C_IDENTIFIER.
+                                  type: string
+                                value:
+                                  description: 'Variable references $(VAR_NAME) are
+                                    expanded using the previous defined environment
+                                    variables in the container and any service environment
+                                    variables. If a variable cannot be resolved, the
+                                    reference in the input string will be unchanged.
+                                    The $(VAR_NAME) syntax can be escaped with a double
+                                    $$, ie: $$(VAR_NAME). Escaped references will
+                                    never be expanded, regardless of whether the variable
+                                    exists or not. Defaults to "".'
+                                  type: string
+                                valueFrom:
+                                  description: Source for the environment variable's
+                                    value. Cannot be used if value is not empty.
+                                  properties:
+                                    configMapKeyRef:
+                                      description: Selects a key of a ConfigMap.
+                                      properties:
+                                        key:
+                                          description: The key to select.
+                                          type: string
+                                        name:
+                                          description: 'Name of the referent. More
+                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                            TODO: Add other useful fields. apiVersion,
+                                            kind, uid?'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the ConfigMap
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                      - key
+                                      type: object
+                                    fieldRef:
+                                      description: 'Selects a field of the pod: supports
+                                        metadata.name, metadata.namespace, metadata.labels,
+                                        metadata.annotations, spec.nodeName, spec.serviceAccountName,
+                                        status.hostIP, status.podIP.'
+                                      properties:
+                                        apiVersion:
+                                          description: Version of the schema the FieldPath
+                                            is written in terms of, defaults to "v1".
+                                          type: string
+                                        fieldPath:
+                                          description: Path of the field to select
+                                            in the specified API version.
+                                          type: string
+                                      required:
+                                      - fieldPath
+                                      type: object
+                                    resourceFieldRef:
+                                      description: 'Selects a resource of the container:
+                                        only resources limits and requests (limits.cpu,
+                                        limits.memory, limits.ephemeral-storage, requests.cpu,
+                                        requests.memory and requests.ephemeral-storage)
+                                        are currently supported.'
+                                      properties:
+                                        containerName:
+                                          description: 'Container name: required for
+                                            volumes, optional for env vars'
+                                          type: string
+                                        divisor:
+                                          description: Specifies the output format
+                                            of the exposed resources, defaults to
+                                            "1"
+                                          type: string
+                                        resource:
+                                          description: 'Required: resource to select'
+                                          type: string
+                                      required:
+                                      - resource
+                                      type: object
+                                    secretKeyRef:
+                                      description: Selects a key of a secret in the
+                                        pod's namespace
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          description: 'Name of the referent. More
+                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                            TODO: Add other useful fields. apiVersion,
+                                            kind, uid?'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                      - key
+                                      type: object
+                                  type: object
+                              required:
+                              - name
+                              type: object
+                            type: array
+                          extraPorts:
+                            description: Extra port mappings to apply to the emulator
+                              pods.
+                            items:
+                              description: ContainerPort represents a network port
+                                in a single container.
+                              properties:
+                                containerPort:
+                                  description: Number of port to expose on the pod's
+                                    IP address. This must be a valid port number,
+                                    0 < x < 65536.
+                                  format: int32
+                                  type: integer
+                                hostIP:
+                                  description: What host IP to bind the external port
+                                    to.
+                                  type: string
+                                hostPort:
+                                  description: Number of port to expose on the host.
+                                    If specified, this must be a valid port number,
+                                    0 < x < 65536. If HostNetwork is specified, this
+                                    must match ContainerPort. Most containers do not
+                                    need this.
+                                  format: int32
+                                  type: integer
+                                name:
+                                  description: If specified, this must be an IANA_SVC_NAME
+                                    and unique within the pod. Each named port in
+                                    a pod must have a unique name. Name for the port
+                                    that can be referred to by services.
+                                  type: string
+                                protocol:
+                                  description: Protocol for port. Must be UDP, TCP,
+                                    or SCTP. Defaults to "TCP".
+                                  type: string
+                              required:
+                              - containerPort
+                              type: object
+                            type: array
+                          imagePullPolicy:
+                            description: The pull policy to use for emulator pods
+                            type: string
+                          imagePullSecrets:
+                            description: Pull secrets required for the docker image.
+                            items:
+                              description: LocalObjectReference contains enough information
+                                to let you locate the referenced object inside the
+                                same namespace.
+                              properties:
+                                name:
+                                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                    TODO: Add other useful fields. apiVersion, kind,
+                                    uid?'
+                                  type: string
+                              type: object
+                            type: array
+                          kvmEnabled:
+                            description: Whether to mount the kvm device to the pods,
+                              will require that the operator can launch privileged
+                              pods.
+                            type: boolean
+                          resources:
+                            description: Resource restraints to place on the emulators.
+                            properties:
+                              limits:
+                                additionalProperties:
+                                  type: string
+                                description: 'Limits describes the maximum amount
+                                  of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  type: string
+                                description: 'Requests describes the minimum amount
+                                  of compute resources required. If Requests is omitted
+                                  for a container, it defaults to Limits if that is
+                                  explicitly specified, otherwise to an implementation-defined
+                                  value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                            type: object
+                          startupJobTemplates:
+                            description: 'A list of AndroidJobTemplates to execute
+                              against new instances. TODO: Very very very beta'
+                            items:
+                              type: string
+                            type: array
+                          tcpRedir:
+                            description: Configuration for the tcp redirection side
+                              car
+                            properties:
+                              enabled:
+                                description: Whether to run a sidecar with emulator
+                                  pods that redirects TCP traffic on the adb port
+                                  to the emulator adb server listening on the loopback
+                                  interface. This is required for the image used in
+                                  this repository, but if you are using an image that
+                                  exposes ADB on all interfaces itself, this is not
+                                  required.
+                                type: boolean
+                              image:
+                                description: Image is the repository to download the
+                                  image from. Defaults to quay.io/tinyzimmer/goredir
+                                  whose source is in this repository.
+                                type: string
+                              imagePullPolicy:
+                                description: The pull policy to attach to deployments
+                                  using this image.
+                                type: string
+                              imagePullSecrets:
+                                description: Any pull secrets required for downloading
+                                  the image.
+                                items:
+                                  description: LocalObjectReference contains enough
+                                    information to let you locate the referenced object
+                                    inside the same namespace.
+                                  properties:
+                                    name:
+                                      description: 'Name of the referent. More info:
+                                        https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                        TODO: Add other useful fields. apiVersion,
+                                        kind, uid?'
+                                      type: string
+                                  type: object
+                                type: array
+                            type: object
+                          volumes:
+                            description: A list of volume configurations to apply
+                              to the emulator pods.
+                            items:
+                              description: Volume represents a volume configuration
+                                for the emulator.
+                              properties:
+                                mountPoint:
+                                  description: Where to mount the volume in emulator
+                                    pods.
+                                  type: string
+                                pvcSpec:
+                                  description: A PVC spec to use for creating the
+                                    emulator volumes.
+                                  properties:
+                                    accessModes:
+                                      description: 'AccessModes contains the desired
+                                        access modes the volume should have. More
+                                        info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                                      items:
+                                        type: string
+                                      type: array
+                                    dataSource:
+                                      description: This field requires the VolumeSnapshotDataSource
+                                        alpha feature gate to be enabled and currently
+                                        VolumeSnapshot is the only supported data
+                                        source. If the provisioner can support VolumeSnapshot
+                                        data source, it will create a new volume and
+                                        data will be restored to the volume at the
+                                        same time. If the provisioner does not support
+                                        VolumeSnapshot data source, volume will not
+                                        be created and the failure will be reported
+                                        as an event. In the future, we plan to support
+                                        more data source types and the behavior of
+                                        the provisioner may change.
+                                      properties:
+                                        apiGroup:
+                                          description: APIGroup is the group for the
+                                            resource being referenced. If APIGroup
+                                            is not specified, the specified Kind must
+                                            be in the core API group. For any other
+                                            third-party types, APIGroup is required.
+                                          type: string
+                                        kind:
+                                          description: Kind is the type of resource
+                                            being referenced
+                                          type: string
+                                        name:
+                                          description: Name is the name of resource
+                                            being referenced
+                                          type: string
+                                      required:
+                                      - kind
+                                      - name
+                                      type: object
+                                    resources:
+                                      description: 'Resources represents the minimum
+                                        resources the volume should have. More info:
+                                        https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                                      properties:
+                                        limits:
+                                          additionalProperties:
+                                            type: string
+                                          description: 'Limits describes the maximum
+                                            amount of compute resources allowed. More
+                                            info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                          type: object
+                                        requests:
+                                          additionalProperties:
+                                            type: string
+                                          description: 'Requests describes the minimum
+                                            amount of compute resources required.
+                                            If Requests is omitted for a container,
+                                            it defaults to Limits if that is explicitly
+                                            specified, otherwise to an implementation-defined
+                                            value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                          type: object
+                                      type: object
+                                    selector:
+                                      description: A label query over volumes to consider
+                                        for binding.
+                                      properties:
+                                        matchExpressions:
+                                          description: matchExpressions is a list
+                                            of label selector requirements. The requirements
+                                            are ANDed.
+                                          items:
+                                            description: A label selector requirement
+                                              is a selector that contains values,
+                                              a key, and an operator that relates
+                                              the key and values.
+                                            properties:
+                                              key:
+                                                description: key is the label key
+                                                  that the selector applies to.
+                                                type: string
+                                              operator:
+                                                description: operator represents a
+                                                  key's relationship to a set of values.
+                                                  Valid operators are In, NotIn, Exists
+                                                  and DoesNotExist.
+                                                type: string
+                                              values:
+                                                description: values is an array of
+                                                  string values. If the operator is
+                                                  In or NotIn, the values array must
+                                                  be non-empty. If the operator is
+                                                  Exists or DoesNotExist, the values
+                                                  array must be empty. This array
+                                                  is replaced during a strategic merge
+                                                  patch.
+                                                items:
+                                                  type: string
+                                                type: array
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                        matchLabels:
+                                          additionalProperties:
+                                            type: string
+                                          description: matchLabels is a map of {key,value}
+                                            pairs. A single {key,value} in the matchLabels
+                                            map is equivalent to an element of matchExpressions,
+                                            whose key field is "key", the operator
+                                            is "In", and the values array contains
+                                            only "value". The requirements are ANDed.
+                                          type: object
+                                      type: object
+                                    storageClassName:
+                                      description: 'Name of the StorageClass required
+                                        by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                                      type: string
+                                    volumeMode:
+                                      description: volumeMode defines what type of
+                                        volume is required by the claim. Value of
+                                        Filesystem is implied when not included in
+                                        claim spec. This is a beta feature.
+                                      type: string
+                                    volumeName:
+                                      description: VolumeName is the binding reference
+                                        to the PersistentVolume backing this claim.
+                                      type: string
+                                  type: object
+                                volumePrefix:
+                                  description: A prefix to apply to PVCs created for
+                                    devices using this configuration.
+                                  type: string
+                              required:
+                              - mountPoint
+                              - pvcSpec
+                              - volumePrefix
+                              type: object
+                            type: array
+                        type: object
+                      deviceManagementPolicy:
+                        description: A policy for managing concurrency during provisioning/updates
+                          of android emulators.
+                        properties:
+                          concurrency:
+                            description: The maximum number of devices that can be
+                              booting at any point in time.
+                            format: int32
+                            type: integer
+                          podManagementPolicy:
+                            description: The type of policy to enforce, currently
+                              only OrderedReady.
+                            type: string
+                        type: object
+                      hostnameTemplate:
+                        description: A go-template to use for configuring the hostname
+                          of the devices. Currently only {{ .Index }} is passed to
+                          thte template, but more will come. A headless service is
+                          put in front of device groups to make the individual pods
+                          accessible by their hostname/subdomain
+                        type: string
+                      namespace:
+                        description: The namespace to run the device group, defaults
+                          to the default namespace.
+                        type: string
+                      subdomain:
+                        description: A subdomain to use for the pods in the device
+                          group. This also becomes the name of the headless service.
+                        type: string
+                    type: object
+                  hostUSB:
+                    description: A configuration for connecting host usb devices to
+                      the AndroidFarm.
+                    properties:
+                      maxDevices:
+                        description: Specify the maximum number of devices expected
+                          to run on this host. This is required because for lack of
+                          a better solution we dynamically allocate provider service
+                          ports at the moment and we need to determine how many to
+                          do for a usb farm.
+                        format: int32
+                        type: integer
+                      nodeName:
+                        description: The node to launch an ADB server on for binding
+                          devices to STF.
+                        type: string
+                    type: object
+                  name:
+                    description: A name for the device group, this field is required.
+                      The name is prefixed to all resources created for the group.
+                    type: string
+                  omitFromSTF:
+                    description: 'TODO: implement'
+                    type: boolean
+                  provider:
+                    description: STF provider configurations for this device group.
+                    properties:
+                      clusterLocalADB:
+                        description: When set to true, the provider will advertise
+                          it's cluster local service address for adb connections.
+                          The default behavior is to advertise the external app hostname.
+                        type: boolean
+                      persistDeviceState:
+                        description: Set to true to persist device state (apps, accounts,
+                          caches) between user sessions.
+                        type: boolean
+                      startPort:
+                        description: The starting port to use for provider services.
+                          Defaults to 15000. If specifying multiple device groups,
+                          you should set this explicitly for each group and ensure
+                          they are not able to overlap. (~4 ports per device)
+                        format: int32
+                        type: integer
+                    type: object
+                required:
+                - name
+                type: object
+              type: array
+            deviceManagementPolicy:
+              description: A device management policy to apply globally unless overridden
+                on the group level
+              properties:
+                concurrency:
+                  description: The maximum number of devices that can be booting at
+                    any point in time.
+                  format: int32
+                  type: integer
+                podManagementPolicy:
+                  description: The type of policy to enforce, currently only OrderedReady.
+                  type: string
+              type: object
+            stfConfig:
+              description: The configuration for the OpenSTF Deployment
+              properties:
+                adb:
+                  description: ADB extra configuration options
+                  properties:
+                    image:
+                      description: Image for the adb servers. Defaults to `quay.io/tinyzimmer/adbmon`.
+                        Source in this repository.
+                      type: string
+                    imagePullPolicy:
+                      description: The pull policy to attach to deployments using
+                        this image.
+                      type: string
+                    imagePullSecrets:
+                      description: Any pull secrets required for downloading the image.
+                      items:
+                        description: LocalObjectReference contains enough information
+                          to let you locate the referenced object inside the same
+                          namespace.
+                        properties:
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                        type: object
+                      type: array
+                    resources:
+                      description: The resource restraints for the provider adb sidecars.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                api:
+                  description: API extra configuration options
+                  properties:
+                    replicas:
+                      description: The number of api server replicas to run
+                      format: int32
+                      type: integer
+                    resources:
+                      description: The resource restraints for the stf api servers
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                app:
+                  description: App extra configuration options
+                  properties:
+                    replicas:
+                      description: The number of app replicas to run
+                      format: int32
+                      type: integer
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                appHostname:
+                  description: The external hostname to use when configuring OpenSTF
+                    services. The OpenSTF deployment must be accessible at this address
+                    (or IP).
+                  type: string
+                auth:
+                  description: Authentication configuration options
+                  properties:
+                    mock:
+                      description: Use the stf mock authentication adapter.
+                      type: boolean
+                    oauth:
+                      description: Use OAuth with the provided parameters for authentication.
+                      properties:
+                        authorizationURL:
+                          description: The Authorization URL for the OAuth service
+                          type: string
+                        callbackURL:
+                          description: 'The OAuth callback URL. TODO : This doesn''t
+                            need to be required and can default to:        http(s)://<app_hostname>/auth/oauth/callback'
+                          type: string
+                        clientIDKey:
+                          description: The key in the STF secret that contains the
+                            client id. Defaults to 'client-id'.
+                          type: string
+                        clientSecretKey:
+                          description: The key in the STF secret that contains the
+                            client secret key. Defaults to 'client-secret'.
+                          type: string
+                        scopes:
+                          description: The scopes needed for OAuth.
+                          items:
+                            type: string
+                          type: array
+                        tokenURL:
+                          description: The Token URL for the OAuth service.
+                          type: string
+                        userInfoURL:
+                          description: The User Info URL for the OAuth service.
+                          type: string
+                      required:
+                      - authorizationURL
+                      - callbackURL
+                      - scopes
+                      - tokenURL
+                      - userInfoURL
+                      type: object
+                    resources:
+                      description: Auth deployment resource requirements.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                namespace:
+                  description: The namespace to provision the STF deployments in.
+                    Defaults to the default namespace.
+                  type: string
+                privilegedDeployments:
+                  description: Use privileged security contexts for OpenSTF deployments.
+                    This is required if you are using an image that runs as root.
+                  type: boolean
+                processor:
+                  description: Processor configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                provider:
+                  description: Provider configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                reaper:
+                  description: Reaper configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                rethinkdb:
+                  description: A configuration for the RethinKDB statefulset.
+                  properties:
+                    imagePullPolicy:
+                      description: The pull policy to use for the rethinkdb image.
+                      type: string
+                    pvcSpec:
+                      description: A PVCSpec to use for RethinkDB persistence.
+                      properties:
+                        accessModes:
+                          description: 'AccessModes contains the desired access modes
+                            the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                          items:
+                            type: string
+                          type: array
+                        dataSource:
+                          description: This field requires the VolumeSnapshotDataSource
+                            alpha feature gate to be enabled and currently VolumeSnapshot
+                            is the only supported data source. If the provisioner
+                            can support VolumeSnapshot data source, it will create
+                            a new volume and data will be restored to the volume at
+                            the same time. If the provisioner does not support VolumeSnapshot
+                            data source, volume will not be created and the failure
+                            will be reported as an event. In the future, we plan to
+                            support more data source types and the behavior of the
+                            provisioner may change.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        resources:
+                          description: 'Resources represents the minimum resources
+                            the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                          properties:
+                            limits:
+                              additionalProperties:
+                                type: string
+                              description: 'Limits describes the maximum amount of
+                                compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                            requests:
+                              additionalProperties:
+                                type: string
+                              description: 'Requests describes the minimum amount
+                                of compute resources required. If Requests is omitted
+                                for a container, it defaults to Limits if that is
+                                explicitly specified, otherwise to an implementation-defined
+                                value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                          type: object
+                        selector:
+                          description: A label query over volumes to consider for
+                            binding.
+                          properties:
+                            matchExpressions:
+                              description: matchExpressions is a list of label selector
+                                requirements. The requirements are ANDed.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              description: matchLabels is a map of {key,value} pairs.
+                                A single {key,value} in the matchLabels map is equivalent
+                                to an element of matchExpressions, whose key field
+                                is "key", the operator is "In", and the values array
+                                contains only "value". The requirements are ANDed.
+                              type: object
+                          type: object
+                        storageClassName:
+                          description: 'Name of the StorageClass required by the claim.
+                            More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                          type: string
+                        volumeMode:
+                          description: volumeMode defines what type of volume is required
+                            by the claim. Value of Filesystem is implied when not
+                            included in claim spec. This is a beta feature.
+                          type: string
+                        volumeName:
+                          description: VolumeName is the binding reference to the
+                            PersistentVolume backing this claim.
+                          type: string
+                      type: object
+                    replicas:
+                      description: The number of rethinkdb replicas per shard to make.
+                      format: int32
+                      type: integer
+                    resources:
+                      description: Resource restraints for the rethinkdb instances
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                    shards:
+                      description: The number of shards to use for each table in the
+                        stf database.
+                      format: int32
+                      type: integer
+                    version:
+                      description: The version of rethinkdb to run. Defaults to 2.4.
+                      type: string
+                  type: object
+                rethinkdbProxy:
+                  description: A configuration for the rethinkdb proxy deployment
+                  properties:
+                    replicas:
+                      description: The number of proxy instances to run
+                      format: int32
+                      type: integer
+                    resources:
+                      description: Resource restraints for the proxy instances
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                secret:
+                  description: The name of the kubernetes secret containing secrets
+                    for configuring OpenSTF.
+                  type: string
+                serviceAccount:
+                  description: A kubernetes service account to attach to OpenSTF deployments.
+                    This can be required if you are launching privileged pods that
+                    need to be validated against a PodSecurityPolicy.
+                  type: string
+                stfImage:
+                  description: The docker image configuration to use for the STF services.
+                  properties:
+                    image:
+                      description: Image is the repository to download the image from.
+                        Defaults to openstf/stf:latest.
+                      type: string
+                    imagePullPolicy:
+                      description: The pull policy to attach to deployments using
+                        this image.
+                      type: string
+                    imagePullSecrets:
+                      description: Any pull secrets required for downloading the image.
+                      items:
+                        description: LocalObjectReference contains enough information
+                          to let you locate the referenced object inside the same
+                          namespace.
+                        properties:
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                        type: object
+                      type: array
+                  type: object
+                stfSecretKey:
+                  description: The key in the above secret where the OpenSTF secret
+                    is. Defaults to 'stf-secret'.
+                  type: string
+                storage:
+                  description: A configuration for the OpenSTF storage services.
+                  properties:
+                    pvcSpec:
+                      description: A PVC spec to use for storage persistence. If specifying
+                        more than one replica, only one PVC will be created and it
+                        should allow ReadWriteMany.
+                      properties:
+                        accessModes:
+                          description: 'AccessModes contains the desired access modes
+                            the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                          items:
+                            type: string
+                          type: array
+                        dataSource:
+                          description: This field requires the VolumeSnapshotDataSource
+                            alpha feature gate to be enabled and currently VolumeSnapshot
+                            is the only supported data source. If the provisioner
+                            can support VolumeSnapshot data source, it will create
+                            a new volume and data will be restored to the volume at
+                            the same time. If the provisioner does not support VolumeSnapshot
+                            data source, volume will not be created and the failure
+                            will be reported as an event. In the future, we plan to
+                            support more data source types and the behavior of the
+                            provisioner may change.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        resources:
+                          description: 'Resources represents the minimum resources
+                            the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
+                          properties:
+                            limits:
+                              additionalProperties:
+                                type: string
+                              description: 'Limits describes the maximum amount of
+                                compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                            requests:
+                              additionalProperties:
+                                type: string
+                              description: 'Requests describes the minimum amount
+                                of compute resources required. If Requests is omitted
+                                for a container, it defaults to Limits if that is
+                                explicitly specified, otherwise to an implementation-defined
+                                value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                          type: object
+                        selector:
+                          description: A label query over volumes to consider for
+                            binding.
+                          properties:
+                            matchExpressions:
+                              description: matchExpressions is a list of label selector
+                                requirements. The requirements are ANDed.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              description: matchLabels is a map of {key,value} pairs.
+                                A single {key,value} in the matchLabels map is equivalent
+                                to an element of matchExpressions, whose key field
+                                is "key", the operator is "In", and the values array
+                                contains only "value". The requirements are ANDed.
+                              type: object
+                          type: object
+                        storageClassName:
+                          description: 'Name of the StorageClass required by the claim.
+                            More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
+                          type: string
+                        volumeMode:
+                          description: volumeMode defines what type of volume is required
+                            by the claim. Value of Filesystem is implied when not
+                            included in claim spec. This is a beta feature.
+                          type: string
+                        volumeName:
+                          description: VolumeName is the binding reference to the
+                            PersistentVolume backing this claim.
+                          type: string
+                      type: object
+                    replicas:
+                      description: The number of stf-storage replicas to run
+                      format: int32
+                      type: integer
+                    resources:
+                      description: Storage deployments resource requirements.
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                traefik:
+                  description: A configuration for the traefik deployment/routes put
+                    in front of the STF deployments.
+                  properties:
+                    deployment:
+                      description: Configuration options for the traefik deployment.
+                      properties:
+                        accessLogs:
+                          description: Set to true if you wish for traefik to produce
+                            access logs
+                          type: boolean
+                        dashboard:
+                          description: A configuration for the traefik dashboard
+                          properties:
+                            host:
+                              description: The hostname that should route to the traefik
+                                dashboard.
+                              type: string
+                            ipWhitelist:
+                              description: A list of IP addresses to whitelist for
+                                dashboard access.
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - host
+                          type: object
+                        replicas:
+                          description: The number of traefik instances to run.
+                          format: int32
+                          type: integer
+                        resources:
+                          description: Resource restraints for the traefik deployment
+                          properties:
+                            limits:
+                              additionalProperties:
+                                type: string
+                              description: 'Limits describes the maximum amount of
+                                compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                            requests:
+                              additionalProperties:
+                                type: string
+                              description: 'Requests describes the minimum amount
+                                of compute resources required. If Requests is omitted
+                                for a container, it defaults to Limits if that is
+                                explicitly specified, otherwise to an implementation-defined
+                                value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              type: object
+                          type: object
+                        serviceType:
+                          description: The type of service to create for Traefik.
+                            Defaults to LoadBalancer. If using external SSL from a
+                            pre-existing ingress controller, you'll want to set this
+                            to ClusterIP.
+                          type: string
+                        version:
+                          description: The version of traefik to run, only >2.0 supported.
+                            Defaults to 2.2.0.
+                          type: string
+                      type: object
+                    tls:
+                      description: TLS configurations for traefik
+                      properties:
+                        external:
+                          description: Specify that SSL is managed externally. OpenSTF
+                            will be configured to know it is being served over HTTPS,
+                            but you will be responsible for terminating TLS before
+                            sending traffic to the traefik instance.
+                          type: boolean
+                        issuerRef:
+                          description: (WIP) A cert-manager issuer reference to use
+                            to provision a TLS secret.
+                          properties:
+                            group:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        tlsSecret:
+                          description: Specifies a preexisting TLS secret in the cluster
+                            to use. It must follow the standard format with a tls.crt
+                            and tls.key.
+                          properties:
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                          type: object
+                      type: object
+                    useIngressRoute:
+                      description: (WIP) - use IngressRoute CRDs for an existing traefik
+                        deployment instead of creating a standalone traefik service.
+                      type: boolean
+                  type: object
+                triproxyApp:
+                  description: Triproxy App configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                triproxyDev:
+                  description: Triproxy Dev configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+                websocket:
+                  description: Websocket configuration options
+                  properties:
+                    resources:
+                      description: The resource restraints for the app deployment
+                      properties:
+                        limits:
+                          additionalProperties:
+                            type: string
+                          description: 'Limits describes the maximum amount of compute
+                            resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                        requests:
+                          additionalProperties:
+                            type: string
+                          description: 'Requests describes the minimum amount of compute
+                            resources required. If Requests is omitted for a container,
+                            it defaults to Limits if that is explicitly specified,
+                            otherwise to an implementation-defined value. More info:
+                            https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                          type: object
+                      type: object
+                  type: object
+              required:
+              - appHostname
+              - secret
+              type: object
+          required:
+          - deviceGroups
+          type: object
+        status:
+          description: AndroidFarmStatus defines the observed state of AndroidFarm
+          properties:
+            state:
+              type: string
+          required:
+          - state
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

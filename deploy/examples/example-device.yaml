@@ -1,0 +1,11 @@
+---
+apiVersion: android.stf.io/v1alpha1
+kind: AndroidDevice
+metadata:
+  name: example-device
+spec:
+  # Use the example-config template
+  configRef:
+    name: example-config
+  # Any configuration overrides
+  deviceConfig: {}

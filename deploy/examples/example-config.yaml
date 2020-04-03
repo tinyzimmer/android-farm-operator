@@ -1,0 +1,34 @@
+---
+apiVersion: android.stf.io/v1alpha1
+kind: AndroidDeviceConfig
+metadata:
+  name: example-config
+spec:
+  # The docker image to use for devices using this configuration
+  dockerImage: quay.io/tinyzimmer/android-emulator:android-29-slim
+  # The pull policy
+  imagePullPolicy: IfNotPresent
+  # Enable the KVM device for the emulator, this is pretty much always
+  # required and probably no point in making it configurable
+  kvmEnabled: true
+  # The port ADB listens on inside the emulator image
+  adbPort: 5555
+  # Extra environment variables to pass to the emulator image at launch
+  extraEnvVars:
+    - name: EXTRA_EMULATOR_OPTS
+      value: "-qemu -m 2048"
+    - name: EMULATOR_RAM_SIZE
+      value: "2048"
+  # Resource restraints for the emulator pods
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+  # The Android SDK emulator will only listen for adb connections on the loopback
+  # interface. This configuration option lets you run a sidecar that listens on
+  # the POD_IP and forwards ADB connections to the emulator.
+  # The image defined in this repository is a small go app that fits into
+  # a 2 MB container and serves this purpose.
+  tcpRedir:
+    enabled: true
+    image: quay.io/tinyzimmer/goredir:latest

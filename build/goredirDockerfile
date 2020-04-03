@@ -1,0 +1,11 @@
+FROM golang:1.14-alpine as builder
+
+RUN apk --update add upx
+
+RUN mkdir -p /app
+COPY cmd/goredir/main.go /app/main.go
+RUN GOOS=linux CGO_ENABLED=0 go build -o /app/goredir /app/main.go && upx /app/goredir
+
+FROM scratch
+COPY --from=builder /app/goredir /goredir
+ENTRYPOINT ["/goredir"]

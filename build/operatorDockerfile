@@ -1,0 +1,55 @@
+# Compile image
+FROM golang:1.14-alpine as builder
+
+RUN apk --update-cache add tesseract-ocr tesseract-ocr-dev alpine-sdk upx
+
+# Setup build directory
+RUN mkdir -p /build
+WORKDIR /build
+
+# Go build options - tesseract requires CGO :(
+ENV GO111MODULE=on
+ENV CGO_ENABLED=1
+
+# Fetch deps first as they don't change frequently
+COPY go.mod /build/go.mod
+COPY go.sum /build/go.sum
+RUN go mod download
+
+# Copy go code
+COPY version/ /build/version
+COPY cmd/     /build/cmd
+COPY pkg/     /build/pkg
+
+# Build the binary
+ARG GIT_COMMIT
+RUN go build \
+  -o /tmp/android-farm-operator \
+  -ldflags "-X github.com/tinyzimmer/android-farm-operator/version.GitCommit=${GIT_COMMIT}" \
+  ./cmd/manager && upx /tmp/android-farm-operator
+
+##
+# Build the runtime image
+##
+FROM alpine
+
+ARG ANDROID_TOOLS_VERSION=29.0.6-r0
+ENV ANDROID_TOOLS_VERSION=${ANDROID_TOOLS_VERSION}
+RUN apk --update-cache \
+  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  add android-tools==${ANDROID_TOOLS_VERSION} tesseract-ocr
+
+ENV OPERATOR=/usr/local/bin/android-farm-operator \
+    USER_UID=1001 \
+    USER_NAME=android-farm-operator \
+    HOME=/tmp
+
+# Install operator binary
+COPY --from=builder /tmp/android-farm-operator ${OPERATOR}
+
+COPY build/bin /usr/local/bin
+RUN  /usr/local/bin/user_setup
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
+
+USER ${USER_UID}
