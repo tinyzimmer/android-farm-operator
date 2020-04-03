@@ -37,12 +37,12 @@ var traefikStaticConfigTmpl = template.Must(
   [entryPoints.web]
     address = ":80"
   {{ end }}
-	{{- range $svcName, $svcAttrs := .Services }}
-	{{- if $svcAttrs.IsProvider }}
+  {{- range $svcName, $svcAttrs := .Services }}
+  {{- if $svcAttrs.IsProvider }}
   [entryPoints.{{ $svcName }}]
     address = ":{{ $svcAttrs.Port }}"
-	{{ end -}}
-	{{ end }}
+  {{ end -}}
+  {{ end }}
 
 [providers]
   [providers.file]
@@ -76,11 +76,11 @@ var traefikDynamicConfigTmpl = template.Must(
   [http.services]
     {{ range $svcName, $svcAttrs := .Services }}
     [http.services.{{ $svcName }}.loadBalancer]
-			{{- range $idx, $ep := $svcAttrs.Endpoints }}
+      {{- range $idx, $ep := $svcAttrs.Endpoints }}
       [[http.services.{{ $svcName }}.loadBalancer.servers]]
         url = "http://{{ $ep }}:{{ $svcAttrs.Port }}/"
-			{{- end }}
-			[http.services.{{ $svcName }}.loadBalancer.sticky.cookie]
+      {{- end }}
+      [http.services.{{ $svcName }}.loadBalancer.sticky.cookie]
     {{ end }}
 
   [http.routers]
@@ -105,7 +105,7 @@ var traefikDynamicConfigTmpl = template.Must(
       {{ end -}}
     {{ end }}
     {{ range $proxyName, $proxyAttrs := .Proxies }}
-		[http.routers.{{ $proxyName }}-proxy]
+    [http.routers.{{ $proxyName }}-proxy]
       rule = "{{ $proxyAttrs.Rule }}"
       entryPoints = ["proxy"]
       service = "{{ $proxyName }}"
@@ -117,22 +117,22 @@ var traefikDynamicConfigTmpl = template.Must(
   [tcp.services]
     {{ range $svcName, $svcAttrs := .Services -}}
     {{- if $svcAttrs.IsProvider }}
-		{{- range $idx, $ep := $svcAttrs.Endpoints }}
-		[[tcp.services.{{ $svcName }}.loadBalancer.servers]]
-			address = "{{ $ep }}:{{ $svcAttrs.Port }}"
-		{{- end }}
+    {{- range $idx, $ep := $svcAttrs.Endpoints }}
+    [[tcp.services.{{ $svcName }}.loadBalancer.servers]]
+      address = "{{ $ep }}:{{ $svcAttrs.Port }}"
+    {{- end }}
     {{- end }}
     {{- end }}
 
   [tcp.routers]
-		{{ $backtick := .Backtick -}}
-		{{ range $svcName, $svcAttrs := .Services -}}
-		{{ if $svcAttrs.IsProvider }}
+    {{ $backtick := .Backtick -}}
+    {{ range $svcName, $svcAttrs := .Services -}}
+    {{ if $svcAttrs.IsProvider }}
     [tcp.routers.{{ $svcName }}]
       service = "{{ $svcName }}"
       entrypoints = ["{{ $svcName }}"]
       rule = "HostSNI({{ $backtick }}*{{ $backtick }})"
-		{{ end -}}
-		{{ end }}
+    {{ end -}}
+    {{ end }}
 
 `))
