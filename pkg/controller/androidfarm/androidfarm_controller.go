@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/resources"
 	"github.com/tinyzimmer/android-farm-operator/pkg/resources/emulators"
@@ -11,7 +12,6 @@ import (
 	"github.com/tinyzimmer/android-farm-operator/pkg/resources/stf"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/errors"
-	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -29,12 +29,7 @@ import (
 
 var log = logf.Log.WithName("controller_androidfarm")
 
-var farmFinalizer = "finalizer.androidfarms.android.tinyzimmer.com"
-
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
+var farmFinalizer = "finalizer.androidfarms.android.stf.io"
 
 // Add creates a new AndroidFarm Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
