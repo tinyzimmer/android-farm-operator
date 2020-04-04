@@ -75,7 +75,6 @@ func newProxyStatefulSetForCR(cr *androidv1alpha1.AndroidFarm, joinStr, waitStr 
 							Name:            "rethinkdb-proxy",
 							ImagePullPolicy: cr.STFConfig().RethinkDBPullPolicy(),
 							Image:           cr.STFConfig().RethinkDBImage(),
-							VolumeMounts:    cr.RethinkDBVolumeMounts(),
 							Command:         []string{"/bin/bash", "-c"},
 							Args:            []string{proxyStartScript},
 							Env: append(cr.RethinkDBEnvVars(), []corev1.EnvVar{

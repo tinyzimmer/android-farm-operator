@@ -55,7 +55,14 @@ func (c *AndroidDeviceConfig) IsKVMEnabled() bool {
 // GetPorts returns the container ports to be used for pods using this
 // configuration.
 func (c *AndroidDeviceConfig) GetPorts() []corev1.ContainerPort {
-	return c.Spec.ExtraPorts
+	ports := make([]corev1.ContainerPort, 0)
+	if c.Spec.TCPRedir == nil || !c.Spec.TCPRedir.Enabled {
+		ports = append(ports, c.GetADBContainerPort()...)
+	}
+	if c.Spec.ExtraPorts != nil {
+		ports = append(ports, c.Spec.ExtraPorts...)
+	}
+	return ports
 }
 
 // GetADBContainerPort returns the adb port to be used by the redir sidecar.

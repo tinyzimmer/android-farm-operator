@@ -2,14 +2,15 @@ package emulators
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/resources"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/android"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/errors"
-	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -91,6 +92,7 @@ func (r *EmulatorDeviceReconciler) Reconcile(reqLogger logr.Logger, instance *an
 	if found.Status.PodIP == "" {
 		return errors.NewRequeueError("The device has not yet been assigned a private IP address", 3)
 	}
+	reqLogger.Info(fmt.Sprintf("Connecting to android device %s on %s:%d", found.Name, found.Status.PodIP, adbPort))
 	sess, err := android.NewSession(reqLogger, found.Status.PodIP, adbPort)
 	if err != nil {
 		return err
