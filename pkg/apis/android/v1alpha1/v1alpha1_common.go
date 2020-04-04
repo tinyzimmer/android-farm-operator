@@ -75,6 +75,8 @@ var (
 	// defaultOauthClientSecretKey is the default key where the oauth client secret
 	// is found inside a provided kubernetes secret.
 	defaultOAuthClientSecretKey = "client-secret"
+	// defaultRunUser is the default user to run stf containers as
+	defaultRunUser int64 = 1000
 
 	// predefined bools to easily grab pointers to
 	trueVal  = true

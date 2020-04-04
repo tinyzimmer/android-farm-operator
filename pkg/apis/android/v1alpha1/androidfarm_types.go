@@ -113,9 +113,6 @@ type STFConfig struct {
 	// required if you are launching privileged pods that need to be validated against
 	// a PodSecurityPolicy.
 	ServiceAccount string `json:"serviceAccount,omitempty"`
-	// Use privileged security contexts for OpenSTF deployments. This is required
-	// if you are using an image that runs as root.
-	PrivilegedDeployments bool `json:"privilegedDeployments,omitempty"`
 	// The namespace to provision the STF deployments in. Defaults to the default
 	// namespace.
 	Namespace string `json:"namespace,omitempty"`

@@ -36,8 +36,6 @@ spec:
     appHostname: "stf.kind.local"
     # The secret above with our application secret
     secret: stf-secrets
-    # Use privileged pods (a lot of the images in use run as root - this needs to be adapted)
-    privilegedDeployments: true
     # STF Image to use
     stfImage:
       # The recent latest image works best and doesn't run as root. I need to go back

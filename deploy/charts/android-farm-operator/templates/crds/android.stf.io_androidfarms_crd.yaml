@@ -736,10 +736,6 @@ spec:
                   description: The namespace to provision the STF deployments in.
                     Defaults to the default namespace.
                   type: string
-                privilegedDeployments:
-                  description: Use privileged security contexts for OpenSTF deployments.
-                    This is required if you are using an image that runs as root.
-                  type: boolean
                 processor:
                   description: Processor configuration options
                   properties:
@@ -1243,7 +1239,9 @@ spec:
                           description: Specify that SSL is managed externally. OpenSTF
                             will be configured to know it is being served over HTTPS,
                             but you will be responsible for terminating TLS before
-                            sending traffic to the traefik instance.
+                            sending traffic to the traefik instance. When using this
+                            option, traefik will listen for requests on port 80, and
+                            you can set up an ingress to `<farm_name>-stf-traefik`.
                           type: boolean
                         issuerRef:
                           description: (WIP) A cert-manager issuer reference to use

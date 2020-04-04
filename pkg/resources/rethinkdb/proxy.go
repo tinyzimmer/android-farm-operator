@@ -21,7 +21,8 @@ while ! getent hosts ${WAIT_SERVERS} ; do sleep 3 ; done
 exec rethinkdb proxy \
 	${JOIN_SERVERS} \
 	--bind all \
-	--canonical-address ${POD_IP}
+	--canonical-address ${POD_IP} \
+  --log-file /data/rethinkdb_data/log_file
 `
 
 // reconcileProxy ensures the proxy servers for the rethinkdb statefulset. We use
@@ -68,7 +69,13 @@ func newProxyStatefulSetForCR(cr *androidv1alpha1.AndroidFarm, joinStr, waitStr 
 				Spec: corev1.PodSpec{
 					ServiceAccountName: cr.STFConfig().GetServiceAccount(),
 					SecurityContext: &corev1.PodSecurityContext{
-						RunAsNonRoot: util.BoolPointer(false),
+						RunAsUser: util.Int64Ptr(1000),
+					},
+					Volumes: []corev1.Volume{
+						{
+							Name:         "rethinkdb-proxy-log",
+							VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+						},
 					},
 					Containers: []corev1.Container{
 						{
@@ -77,6 +84,12 @@ func newProxyStatefulSetForCR(cr *androidv1alpha1.AndroidFarm, joinStr, waitStr 
 							Image:           cr.STFConfig().RethinkDBImage(),
 							Command:         []string{"/bin/bash", "-c"},
 							Args:            []string{proxyStartScript},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "rethinkdb-proxy-log",
+									MountPath: "/data/rethinkdb_data",
+								},
+							},
 							Env: append(cr.RethinkDBEnvVars(), []corev1.EnvVar{
 								{
 									Name:  "JOIN_SERVERS",

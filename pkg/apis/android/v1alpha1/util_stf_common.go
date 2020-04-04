@@ -122,22 +122,14 @@ func (s *STFConfig) GetAppExternalWebsocketURL() string {
 // PodSecurityContext returns the pod security context to use for STF deployments
 // in this farm.
 func (s *STFConfig) PodSecurityContext() *corev1.PodSecurityContext {
-	if s.PrivilegedDeployments {
-		return &corev1.PodSecurityContext{
-			RunAsNonRoot: &falseVal,
-		}
+	return &corev1.PodSecurityContext{
+		RunAsUser: &defaultRunUser,
 	}
-	return nil
 }
 
 // ContainerSecurityContext returns the container security context to use for
 // STF deployments in this farm.
 func (s *STFConfig) ContainerSecurityContext() *corev1.SecurityContext {
-	if s.PrivilegedDeployments {
-		return &corev1.SecurityContext{
-			Privileged: &trueVal,
-		}
-	}
 	return nil
 }
 

@@ -55,7 +55,7 @@ func (r *STFReconciler) reconcileGroupProvider(reqLogger logr.Logger, instance *
 		WithArgs([]string{startScript}).
 		WithService("ClusterIP").
 		WithRethinkDB().
-		WithPodSecurityContext(instance.STFConfig().PodSecurityContext()).
+		WithPodSecurityContext(instance.STFConfig().ADBPodSecurityContext(group)).
 		WithContainerSecurityContext(instance.STFConfig().ContainerSecurityContext()).
 		WithSidecar(instance.STFConfig().ADBSidecarContainer(name, group)).
 		WithWait()

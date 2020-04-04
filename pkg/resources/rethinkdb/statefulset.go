@@ -22,6 +22,7 @@ if [[ "${ORDINAL}" != "0" ]]; then
 	echo "Join to ${SERVICE_NAME} on ${ENDPOINT}"
 	exec rethinkdb \
 		--bind all \
+    --directory /data/rethinkdb_data \
 		--join ${ENDPOINT} \
 		--server-name ${POD_NAME} \
 		--server-tag ${POD_NAME} \
@@ -31,6 +32,7 @@ else
 	echo "Start single/master instance"
 	exec rethinkdb \
 		--bind all \
+    --directory /data/rethinkdb_data \
 		--server-name ${POD_NAME} \
 		--server-tag ${POD_NAME} \
 		--server-tag ${NODE_NAME} \
@@ -69,8 +71,9 @@ func newStatefulSetForCR(cr *androidv1alpha1.AndroidFarm) *appsv1.StatefulSet {
 				Spec: corev1.PodSpec{
 					ServiceAccountName: cr.STFConfig().GetServiceAccount(),
 					SecurityContext: &corev1.PodSecurityContext{
-						RunAsNonRoot: util.BoolPointer(false),
+						RunAsUser: util.Int64Ptr(1000),
 					},
+					Volumes: cr.RethinkDBVolumes(),
 					Containers: []corev1.Container{
 						{
 							Name:            "rethinkdb",

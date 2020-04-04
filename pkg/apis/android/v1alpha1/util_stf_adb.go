@@ -57,7 +57,7 @@ func (f *DeviceGroup) GetProviderStartPort() int32 {
 // ADBPodSecurityContext returns the pod security context to use for adb deployments
 // in this farm.
 func (s *STFConfig) ADBPodSecurityContext(group *DeviceGroup) *corev1.PodSecurityContext {
-	if s.PrivilegedDeployments || group.HostUSB != nil {
+	if group.HostUSB != nil {
 		return &corev1.PodSecurityContext{
 			RunAsNonRoot: &falseVal,
 		}
@@ -68,7 +68,7 @@ func (s *STFConfig) ADBPodSecurityContext(group *DeviceGroup) *corev1.PodSecurit
 // ADBContainerSecurityContext returns the container security context to use for
 // adb deployments in this farm.
 func (s *STFConfig) ADBContainerSecurityContext(group *DeviceGroup) *corev1.SecurityContext {
-	if s.PrivilegedDeployments || group.HostUSB != nil {
+	if group.HostUSB != nil {
 		return &corev1.SecurityContext{
 			Privileged: &trueVal,
 		}

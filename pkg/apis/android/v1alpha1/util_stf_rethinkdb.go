@@ -98,22 +98,31 @@ func (a *AndroidFarm) RethinkDBVolumeClaims() []corev1.PersistentVolumeClaim {
 	return []corev1.PersistentVolumeClaim{}
 }
 
-// RethinkDBVolumeMounts returns the volume mounts to apply to the pods in the
-// RethinkDB StatefulSet.
-func (a *AndroidFarm) RethinkDBVolumeMounts() []corev1.VolumeMount {
+func (a *AndroidFarm) RethinkDBVolumes() []corev1.Volume {
 	if a.STFConfig() != nil {
 		if a.STFConfig().RethinkDB != nil {
 			if a.STFConfig().RethinkDB.PVCSpec != nil {
-				return []corev1.VolumeMount{
-					{
-						Name:      fmt.Sprintf("%s-rethinkdb-storage", a.GetName()),
-						MountPath: "/data/rethinkdb_data",
-					},
-				}
+				return []corev1.Volume{}
 			}
 		}
 	}
-	return []corev1.VolumeMount{}
+	return []corev1.Volume{
+		{
+			Name:         fmt.Sprintf("%s-rethinkdb-storage", a.GetName()),
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		},
+	}
+}
+
+// RethinkDBVolumeMounts returns the volume mounts to apply to the pods in the
+// RethinkDB StatefulSet.
+func (a *AndroidFarm) RethinkDBVolumeMounts() []corev1.VolumeMount {
+	return []corev1.VolumeMount{
+		{
+			Name:      fmt.Sprintf("%s-rethinkdb-storage", a.GetName()),
+			MountPath: "/data/rethinkdb_data",
+		},
+	}
 }
 
 func (s *STFConfig) RethinkDBProxyReplicas() *int32 {

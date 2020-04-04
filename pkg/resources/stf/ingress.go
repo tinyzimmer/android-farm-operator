@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
+	"github.com/tinyzimmer/android-farm-operator/pkg/util"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/builders"
 
 	// traefikv1 "github.com/containous/traefik/v2/pkg/provider/kubernetes/crd/traefik/v1alpha1"
@@ -54,8 +55,15 @@ func reconcileIngressDeployment(reqLogger logr.Logger, c client.Client, instance
 		WithArgs([]string{
 			"--configfile", "/etc/configmap/config.toml",
 		}).
-		WithPodSecurityContext(instance.STFConfig().PodSecurityContext()).
-		WithContainerSecurityContext(instance.STFConfig().ContainerSecurityContext()).
+		WithPodSecurityContext(&corev1.PodSecurityContext{
+			RunAsNonRoot: util.BoolPointer(false),
+		}).
+		WithContainerSecurityContext(&corev1.SecurityContext{
+			Capabilities: &corev1.Capabilities{
+				Drop: []corev1.Capability{"ALL"},
+				Add:  []corev1.Capability{"NET_BIND_SERVICE"},
+			},
+		}).
 		WithPort("proxy", 8880)
 
 	if instance.STFConfig().TLSEnabled() {

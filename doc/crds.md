@@ -820,70 +820,66 @@ this AndroidFarm.
 <td><p>A kubernetes service account to attach to OpenSTF deployments. This can be required if you are launching privileged pods that need to be validated against a PodSecurityPolicy.</p></td>
 </tr>
 <tr class="odd">
-<td><code>privilegedDeployments</code> <em>bool</em></td>
-<td><p>Use privileged security contexts for OpenSTF deployments. This is required if you are using an image that runs as root.</p></td>
-</tr>
-<tr class="even">
 <td><code>namespace</code> <em>string</em></td>
 <td><p>The namespace to provision the STF deployments in. Defaults to the default namespace.</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>stfImage</code> <em><a href="#android.stf.io/v1alpha1.STFImage">STFImage</a></em></td>
 <td><p>The docker image configuration to use for the STF services.</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>adb</code> <em><a href="#android.stf.io/v1alpha1.ADBConfig">ADBConfig</a></em></td>
 <td><p>ADB extra configuration options</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>api</code> <em><a href="#android.stf.io/v1alpha1.APIConfig">APIConfig</a></em></td>
 <td><p>API extra configuration options</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>app</code> <em><a href="#android.stf.io/v1alpha1.AppConfig">AppConfig</a></em></td>
 <td><p>App extra configuration options</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>auth</code> <em><a href="#android.stf.io/v1alpha1.AuthConfig">AuthConfig</a></em></td>
 <td><p>Authentication configuration options</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>processor</code> <em><a href="#android.stf.io/v1alpha1.ProcessorConfig">ProcessorConfig</a></em></td>
 <td><p>Processor configuration options</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>provider</code> <em><a href="#android.stf.io/v1alpha1.GlobalProviderConfig">GlobalProviderConfig</a></em></td>
 <td><p>Provider configuration options</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>reaper</code> <em><a href="#android.stf.io/v1alpha1.ReaperConfig">ReaperConfig</a></em></td>
 <td><p>Reaper configuration options</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>triproxyApp</code> <em><a href="#android.stf.io/v1alpha1.TriproxyAppConfig">TriproxyAppConfig</a></em></td>
 <td><p>Triproxy App configuration options</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>triproxyDev</code> <em><a href="#android.stf.io/v1alpha1.TriproxyDevConfig">TriproxyDevConfig</a></em></td>
 <td><p>Triproxy Dev configuration options</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>websocket</code> <em><a href="#android.stf.io/v1alpha1.WebsocketConfig">WebsocketConfig</a></em></td>
 <td><p>Websocket configuration options</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traefik</code> <em><a href="#android.stf.io/v1alpha1.TraefikConfig">TraefikConfig</a></em></td>
 <td><p>A configuration for the traefik deployment/routes put in front of the STF deployments.</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>rethinkdb</code> <em><a href="#android.stf.io/v1alpha1.RethinkDBConfig">RethinkDBConfig</a></em></td>
 <td><p>A configuration for the RethinKDB statefulset.</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>rethinkdbProxy</code> <em><a href="#android.stf.io/v1alpha1.RethinkDBProxyConfig">RethinkDBProxyConfig</a></em></td>
 <td><p>A configuration for the rethinkdb proxy deployment</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>storage</code> <em><a href="#android.stf.io/v1alpha1.StorageConfig">StorageConfig</a></em></td>
 <td><p>A configuration for the OpenSTF storage services.</p></td>
 </tr>
@@ -1256,4 +1252,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `f11640f`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `733bb81`.*

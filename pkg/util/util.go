@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/go-logr/logr"
+	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -16,9 +16,9 @@ import (
 
 type FarmReconcileFunc func(logr.Logger, *androidv1alpha1.AndroidFarm) error
 
-func BoolPointer(b bool) *bool {
-	return &b
-}
+func BoolPointer(b bool) *bool { return &b }
+
+func Int64Ptr(i int64) *int64 { return &i }
 
 func IsMarkedForDeletion(cr *androidv1alpha1.AndroidFarm) bool {
 	return cr.GetDeletionTimestamp() != nil
