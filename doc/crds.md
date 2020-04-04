@@ -1054,7 +1054,7 @@ self-signed certificate. Should only be done for testing.
 </tr>
 <tr class="odd">
 <td><code>external</code> <em>bool</em></td>
-<td><p>Specify that SSL is managed externally. OpenSTF will be configured to know it is being served over HTTPS, but you will be responsible for terminating TLS before sending traffic to the traefik instance.</p></td>
+<td><p>Specify that SSL is managed externally. OpenSTF will be configured to know it is being served over HTTPS, but you will be responsible for terminating TLS before sending traffic to the traefik instance. When using this option, traefik will listen for requests on port 80, and you can set up an ingress to <code>&lt;farm_name&gt;-stf-traefik</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1256,4 +1256,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `c445a32`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `f11640f`.*

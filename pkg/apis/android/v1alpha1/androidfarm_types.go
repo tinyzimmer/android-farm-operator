@@ -264,7 +264,9 @@ type TLSConfig struct {
 	IssuerRef *cmmeta.ObjectReference `json:"issuerRef,omitempty"`
 	// Specify that SSL is managed externally. OpenSTF will be configured to know
 	// it is being served over HTTPS, but you will be responsible for terminating
-	// TLS before sending traffic to the traefik instance.
+	// TLS before sending traffic to the traefik instance. When using this option,
+	// traefik will listen for requests on port 80, and you can set up an ingress to
+	// `<farm_name>-stf-traefik`.
 	External bool `json:"external,omitempty"`
 }
 
