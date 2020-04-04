@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util"
-	"github.com/go-logr/logr"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -94,18 +94,8 @@ func newSTFBindingJob(cr *androidv1alpha1.AndroidFarm, device *corev1.Pod, adbSe
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-stf-connect", device.GetName()),
-			Namespace: device.GetNamespace(),
+			Namespace: cr.STFConfig().GetNamespace(),
 			Labels:    device.GetLabels(),
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         device.APIVersion,
-					Kind:               device.Kind,
-					Name:               device.Name,
-					UID:                device.UID,
-					Controller:         util.BoolPointer(true),
-					BlockOwnerDeletion: util.BoolPointer(true),
-				},
-			},
 		},
 		Spec: batchv1.JobSpec{
 			TTLSecondsAfterFinished: &jobTTL,
