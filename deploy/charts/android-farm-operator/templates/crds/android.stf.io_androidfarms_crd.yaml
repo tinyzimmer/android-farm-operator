@@ -1183,6 +1183,11 @@ spec:
                           description: Set to true if you wish for traefik to produce
                             access logs
                           type: boolean
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          description: Extra annotations to apply to the traefik service
+                          type: object
                         dashboard:
                           description: A configuration for the traefik dashboard
                           properties:
@@ -1222,6 +1227,12 @@ spec:
                                 value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                               type: object
                           type: object
+                        serviceNames:
+                          description: A list of optional service names to route to
+                            traefik from inside the cluster
+                          items:
+                            type: string
+                          type: array
                         serviceType:
                           description: The type of service to create for Traefik.
                             Defaults to LoadBalancer. If using external SSL from a
@@ -1245,8 +1256,8 @@ spec:
                             you can set up an ingress to `<farm_name>-stf-traefik`.
                           type: boolean
                         issuerRef:
-                          description: (WIP) A cert-manager issuer reference to use
-                            to provision a TLS secret.
+                          description: A cert-manager issuer reference to use to provision
+                            a TLS secret.
                           properties:
                             group:
                               type: string

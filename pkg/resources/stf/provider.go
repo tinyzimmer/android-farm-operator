@@ -36,6 +36,10 @@ func (r *STFReconciler) reconcileProviders(reqLogger logr.Logger, instance *andr
 			return err
 		}
 
+		if err := r.reconcileGroupProviderTraefik(reqLogger, instance, group); err != nil {
+			return err
+		}
+
 	}
 
 	return nil
@@ -56,7 +60,7 @@ func (r *STFReconciler) reconcileGroupProvider(reqLogger logr.Logger, instance *
 		WithService("ClusterIP").
 		WithRethinkDB().
 		WithPodSecurityContext(instance.STFConfig().ADBPodSecurityContext(group)).
-		WithContainerSecurityContext(instance.STFConfig().ContainerSecurityContext()).
+		WithContainerSecurityContext(instance.STFConfig().ADBContainerSecurityContext(group)).
 		WithSidecar(instance.STFConfig().ADBSidecarContainer(name, group)).
 		WithWait()
 
@@ -80,6 +84,56 @@ func (r *STFReconciler) reconcileGroupProvider(reqLogger logr.Logger, instance *
 
 	for i := group.GetProviderStartPort(); i <= getProviderMaxPort(group.GetProviderStartPort(), maxPort); i++ {
 		builder = builder.WithPort(fmt.Sprintf("provider-%d", i), i)
+	}
+
+	return builder.Reconcile(r.client)
+}
+
+func (r *STFReconciler) reconcileGroupProviderTraefik(reqLogger logr.Logger, instance *androidv1alpha1.AndroidFarm, group *androidv1alpha1.DeviceGroup) error {
+	providerDefs := calculateProviderSvcDefinitions(instance, group, false)
+
+	var static bytes.Buffer
+	if err := providerTraefikStaticConfigTmpl.Execute(&static, map[string]interface{}{
+		"Services":  providerDefs,
+		"AccessLog": instance.STFConfig().TraefikAccessLogsEnabled(),
+		"Backtick":  "`",
+	}); err != nil {
+		return err
+	}
+	var dynamic bytes.Buffer
+	if err := providerTraefikDynamicConfigTmpl.Execute(&dynamic, map[string]interface{}{
+		"Services": providerDefs,
+		"Backtick": "`",
+	}); err != nil {
+		return err
+	}
+
+	builder := builders.NewDeploymentBuilder(reqLogger, instance, fmt.Sprintf("%s-traefik", group.GetProviderName())).
+		WithImage(instance.STFConfig().TraefikImage()).
+		WithFile("config.toml", static.String()).
+		WithFile("routes/stf.toml", dynamic.String()).
+		WithCommand([]string{"traefik"}).
+		WithArgs([]string{
+			"--configfile", "/etc/configmap/config.toml",
+		}).
+		WithService("ClusterIP").
+		WithPort("web", 8088).
+		WithPodSecurityContext(instance.STFConfig().PodSecurityContext())
+		// WithContainerSecurityContext(&corev1.SecurityContext{
+		// 	Capabilities: &corev1.Capabilities{
+		// 		Drop: []corev1.Capability{"ALL"},
+		// 		Add:  []corev1.Capability{"NET_BIND_SERVICE"},
+		// 	},
+		// })
+
+	for _, svc := range providerDefs {
+		for svcName, svcAttrs := range svc {
+			port, _ := strconv.Atoi(svcAttrs.Port)
+			if len(svcName) > 15 {
+				svcName = svcName[len(svcName)-15:]
+			}
+			builder = builder.WithPort(svcName, int32(port))
+		}
 	}
 
 	return builder.Reconcile(r.client)

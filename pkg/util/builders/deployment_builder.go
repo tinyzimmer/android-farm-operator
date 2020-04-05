@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util"
 	stfutil "github.com/tinyzimmer/android-farm-operator/pkg/util/stf"
-	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +30,9 @@ type DeploymentBuilder struct {
 	resources                corev1.ResourceRequirements
 	envVars                  []corev1.EnvVar
 	service                  bool
+	serviceMap               []map[string]int32
 	serviceType              corev1.ServiceType
+	serviceAnnotations       map[string]string
 	headless                 bool
 	files                    []map[string]string
 	podSecurityContext       *corev1.PodSecurityContext
@@ -139,9 +141,20 @@ func (d *DeploymentBuilder) WithService(t string) *DeploymentBuilder {
 	return d
 }
 
+func (d *DeploymentBuilder) WithServiceMap(t string, mappings []map[string]int32) *DeploymentBuilder {
+	d = d.WithService(t)
+	d.serviceMap = mappings
+	return d
+}
+
 func (d *DeploymentBuilder) WithHeadlessService() *DeploymentBuilder {
 	d.headless = true
 	return d.WithService("")
+}
+
+func (d *DeploymentBuilder) WithServiceAnnotations(annotations map[string]string) *DeploymentBuilder {
+	d.serviceAnnotations = annotations
+	return d
 }
 
 func (d *DeploymentBuilder) WithEnvVar(name, value string) *DeploymentBuilder {
@@ -188,7 +201,11 @@ func (d *DeploymentBuilder) WithSidecar(container corev1.Container) *DeploymentB
 	if d.sidecars == nil {
 		d.sidecars = make([]corev1.Container, 0)
 	}
-	container.Env = d.envVars
+	if container.Env != nil {
+		container.Env = append(container.Env, d.envVars...)
+	} else {
+		container.Env = d.envVars
+	}
 	d.sidecars = append(d.sidecars, container)
 	return d
 }
@@ -315,13 +332,33 @@ func (d *DeploymentBuilder) buildDeployment() *appsv1.Deployment {
 	}
 }
 
-func (d *DeploymentBuilder) buildService() *corev1.Service {
+func (d *DeploymentBuilder) getServicePort(name string) int32 {
+	for _, portMap := range d.serviceMap {
+		for mname, mport := range portMap {
+			if mname == name {
+				return mport
+			}
+		}
+	}
+	return 0
+}
+
+func (d *DeploymentBuilder) buildServicePorts() []corev1.ServicePort {
 	ports := make([]corev1.ServicePort, 0)
 	for _, portDef := range d.ports {
 		for name, port := range portDef {
+			var svcPort int32
+			if d.serviceMap != nil {
+				svcPort = d.getServicePort(name)
+				if svcPort == 0 {
+					svcPort = port
+				}
+			} else {
+				svcPort = port
+			}
 			ports = append(ports, corev1.ServicePort{
 				Name:       name,
-				Port:       port,
+				Port:       svcPort,
 				TargetPort: intstr.FromInt(int(port)),
 			})
 		}
@@ -330,15 +367,29 @@ func (d *DeploymentBuilder) buildService() *corev1.Service {
 		for _, sidecar := range d.sidecars {
 			if sidecar.Ports != nil {
 				for _, port := range sidecar.Ports {
+					var svcPort int32
+					if d.serviceMap != nil {
+						svcPort = d.getServicePort(port.Name)
+						if svcPort == 0 {
+							svcPort = port.ContainerPort
+						}
+					} else {
+						svcPort = port.ContainerPort
+					}
 					ports = append(ports, corev1.ServicePort{
 						Name:       port.Name,
-						Port:       port.ContainerPort,
+						Port:       svcPort,
 						TargetPort: intstr.FromInt(int(port.ContainerPort)),
 					})
 				}
 			}
 		}
 	}
+	return ports
+}
+
+func (d *DeploymentBuilder) buildService() *corev1.Service {
+	ports := d.buildServicePorts()
 	var clusterIP string
 	if d.headless {
 		clusterIP = "None"
@@ -348,6 +399,7 @@ func (d *DeploymentBuilder) buildService() *corev1.Service {
 			Name:            fmt.Sprintf("%s-%s", d.cr.STFNamePrefix(), d.component),
 			Namespace:       d.cr.STFConfig().GetNamespace(),
 			Labels:          d.cr.STFComponentLabels(d.component),
+			Annotations:     d.serviceAnnotations,
 			OwnerReferences: d.cr.OwnerReferences(),
 		},
 		Spec: corev1.ServiceSpec{

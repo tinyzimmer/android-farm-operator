@@ -106,3 +106,17 @@ func (s *STFConfig) TraefikDashboardWhitelistString() string {
 	}
 	return defaultTraefikWhitelist
 }
+
+func (s *STFConfig) TraefikServiceNames() []string {
+	if s.Traefik != nil && s.Traefik.Deployment != nil && s.Traefik.Deployment.ServiceNames != nil {
+		return s.Traefik.Deployment.ServiceNames
+	}
+	return []string{}
+}
+
+func (s *STFConfig) TraefikServiceAnnotations() map[string]string {
+	if s.Traefik != nil && s.Traefik.Deployment != nil && s.Traefik.Deployment.Annotations != nil {
+		return s.Traefik.Deployment.Annotations
+	}
+	return map[string]string{}
+}

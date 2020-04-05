@@ -38,12 +38,14 @@ func newJobForCR(cr *androidv1alpha1.AndroidFarm) *batchv1.Job {
 				Spec: corev1.PodSpec{
 					ServiceAccountName: cr.STFConfig().GetServiceAccount(),
 					RestartPolicy:      "OnFailure",
+					SecurityContext:    cr.STFConfig().PodSecurityContext(),
 					Containers: []corev1.Container{
 						{
-							Name:    "stf-migrate",
-							Image:   cr.STFConfig().OpenSTFImage(),
-							Command: []string{"/bin/bash", "-c"},
-							Args:    []string{"while ! getent hosts ${PROXY_NAME} ; do sleep 3 ; done && stf migrate"},
+							Name:            "stf-migrate",
+							Image:           cr.STFConfig().OpenSTFImage(),
+							Command:         []string{"/bin/bash", "-c"},
+							Args:            []string{"while ! getent hosts ${PROXY_NAME} ; do sleep 3 ; done && stf migrate"},
+							SecurityContext: cr.STFConfig().ContainerSecurityContext(),
 							Env: append(cr.RethinkDBEnvVars(), corev1.EnvVar{
 								Name:  "RETHINKDB_PORT_28015_TCP",
 								Value: stfutil.RethinkDBProxyEndpoint(cr),

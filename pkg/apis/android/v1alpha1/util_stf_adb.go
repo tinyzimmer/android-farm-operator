@@ -62,7 +62,9 @@ func (s *STFConfig) ADBPodSecurityContext(group *DeviceGroup) *corev1.PodSecurit
 			RunAsNonRoot: &falseVal,
 		}
 	}
-	return nil
+	return &corev1.PodSecurityContext{
+		RunAsUser: &defaultRunUser,
+	}
 }
 
 // ADBContainerSecurityContext returns the container security context to use for
@@ -105,6 +107,12 @@ func (s *STFConfig) ADBSidecarContainer(providerName string, group *DeviceGroup)
 		Ports:           []corev1.ContainerPort{{Name: "adb-server", ContainerPort: 5037}},
 		SecurityContext: s.ADBContainerSecurityContext(group),
 		Resources:       s.ADBResourceRequirements(),
+		Env: []corev1.EnvVar{
+			{
+				Name:  "HOME",
+				Value: "/tmp",
+			},
+		},
 	}
 	if container.Image == "quay.io/tinyzimmer/adbmon:latest" {
 		if group.IsEmulatedGroup() {

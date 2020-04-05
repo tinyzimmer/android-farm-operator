@@ -3,9 +3,9 @@ package stf
 import (
 	"context"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/builders"
-	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -54,6 +54,8 @@ func (r *STFReconciler) reconcileAPKStorage(reqLogger logr.Logger, instance *and
 			"--storage-url", instance.InternalStorageURL(),
 		}).
 		WithService("ClusterIP").
+		WithPodSecurityContext(instance.STFConfig().PodSecurityContext()).
+		WithContainerSecurityContext(instance.STFConfig().ContainerSecurityContext()).
 		WithWait().
 		Reconcile(r.client)
 }
@@ -69,6 +71,8 @@ func (r *STFReconciler) reconcileImageStorage(reqLogger logr.Logger, instance *a
 			"--storage-url", instance.InternalStorageURL(),
 		}).
 		WithService("ClusterIP").
+		WithPodSecurityContext(instance.STFConfig().PodSecurityContext()).
+		WithContainerSecurityContext(instance.STFConfig().ContainerSecurityContext()).
 		WithWait().
 		Reconcile(r.client)
 }

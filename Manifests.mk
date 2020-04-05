@@ -32,7 +32,16 @@ data:
       - 172.17.255.1-172.17.255.250
 endef
 
+define SELF_SIGNER
+apiVersion: cert-manager.io/v1alpha3
+kind: ClusterIssuer
+metadata:
+  name: cluster-selfsigner
+spec:
+  selfSigned: {}
+endef
+
 export KIND_CLUSTER_MANIFEST
 export METALLB_CONFIG
-
+export SELF_SIGNER
 ##

@@ -257,7 +257,7 @@ type TLSConfig struct {
 	// Specifies a preexisting TLS secret in the cluster to use. It must follow
 	// the standard format with a tls.crt and tls.key.
 	TLSSecret *corev1.LocalObjectReference `json:"tlsSecret,omitempty"`
-	// (WIP) A cert-manager issuer reference to use to provision a TLS secret.
+	// A cert-manager issuer reference to use to provision a TLS secret.
 	IssuerRef *cmmeta.ObjectReference `json:"issuerRef,omitempty"`
 	// Specify that SSL is managed externally. OpenSTF will be configured to know
 	// it is being served over HTTPS, but you will be responsible for terminating
@@ -326,10 +326,14 @@ type TraefikDeployment struct {
 	Replicas int32 `json:"replicas,omitempty"`
 	// The version of traefik to run, only >2.0 supported. Defaults to 2.2.0.
 	Version string `json:"version,omitempty"`
+	// Extra annotations to apply to the traefik service
+	Annotations map[string]string `json:"annotations,omitempty"`
 	// The type of service to create for Traefik. Defaults to LoadBalancer.
 	// If using external SSL from a pre-existing ingress controller, you'll want to
 	// set this to ClusterIP.
 	ServiceType string `json:"serviceType,omitempty"`
+	// A list of optional service names to route to traefik from inside the cluster
+	ServiceNames []string `json:"serviceNames,omitempty"`
 	// Set to true if you wish for traefik to produce access logs
 	AccessLogs bool `json:"accessLogs,omitempty"`
 	// A configuration for the traefik dashboard

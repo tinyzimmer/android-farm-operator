@@ -2,6 +2,8 @@ package v1alpha1
 
 import (
 	"fmt"
+
+	cmmeta "github.com/jetstack/cert-manager/pkg/apis/meta/v1"
 )
 
 // TLSSecret returns the secret to be used for SSL configurations, or an empty
@@ -18,6 +20,13 @@ func (a *AndroidFarm) TLSSecret() string {
 		}
 	}
 	return ""
+}
+
+func (s *STFConfig) GetIssuerReference() *cmmeta.ObjectReference {
+	if s.Traefik != nil && s.Traefik.TLS != nil && s.Traefik.TLS.IssuerRef != nil {
+		return s.Traefik.TLS.IssuerRef
+	}
+	return nil
 }
 
 // TLSEnabled returns true if TLS is being used in front of the OpenSTF

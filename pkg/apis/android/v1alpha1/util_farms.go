@@ -47,7 +47,7 @@ func (a *AndroidFarm) GetDeviceManagementPolicy(group string) *DeviceManagementP
 }
 
 func (a *AndroidFarm) GetGroupADBAdvertiseURL(group *DeviceGroup) string {
-	if group.Provider == nil || !group.Provider.ClusterLocalADB {
+	if !group.UseClusterLocalADB() {
 		return a.STFConfig().GetAppHostname()
 	}
 	return fmt.Sprintf("%s.%s.svc", group.GetProviderName(), a.STFConfig().GetNamespace())
@@ -69,6 +69,10 @@ func (d *DeviceManagementPolicy) GetConcurrency() int32 {
 		return 1
 	}
 	return d.Concurrency
+}
+
+func (g *DeviceGroup) UseClusterLocalADB() bool {
+	return g.Provider != nil && g.Provider.ClusterLocalADB
 }
 
 // MatchingLabels returns the selector for finding devices/pods in this

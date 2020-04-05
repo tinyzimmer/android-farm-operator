@@ -27,21 +27,21 @@ var traefikStaticConfigTmpl = template.Must(
 {{ end -}}
 
 [entryPoints]
-  [entrypoints.proxy]
+
+  [entrypoints.stf-internal-proxy]
 		address = ":8880"
-  {{ if .UseSSL }}
-  [entryPoints.websecure]
-    address = ":443"
-    [entryPoints.websecure.http.tls]
-  {{ else }}
-  [entryPoints.web]
-    address = ":80"
-  {{ end }}
-  {{- range $svcName, $svcAttrs := .Services }}
+
+  [entryPoints.stf-web]
+    address = "{{ if .UseSSL }}:8443{{ else }}:8088{{ end }}"
+    {{ if .UseSSL }}[entryPoints.stf-web.http.tls]{{ end }}
+
+  {{ range $idx, $svc := .Services }}
+  {{- range $svcName, $svcAttrs := $svc }}
   {{- if $svcAttrs.IsProvider }}
   [entryPoints.{{ $svcName }}]
     address = ":{{ $svcAttrs.Port }}"
-  {{ end -}}
+  {{- end }}
+  {{- end }}
   {{ end }}
 
 [providers]
@@ -74,48 +74,54 @@ var traefikDynamicConfigTmpl = template.Must(
   {{ end }}
 
   [http.services]
-    {{ range $svcName, $svcAttrs := .Services }}
+    {{ range $idx, $svc := .Services }}
+    {{- range $svcName, $svcAttrs := $svc }}
     [http.services.{{ $svcName }}.loadBalancer]
       {{- range $idx, $ep := $svcAttrs.Endpoints }}
       [[http.services.{{ $svcName }}.loadBalancer.servers]]
         url = "http://{{ $ep }}:{{ $svcAttrs.Port }}/"
       {{- end }}
       [http.services.{{ $svcName }}.loadBalancer.sticky.cookie]
+    {{- end }}
     {{ end }}
 
   [http.routers]
     {{ if .DashboardEnabled }}
     [http.routers.dashboard]
       rule = "{{ .DashboardRule }}"
-      entryPoints = ["{{ if .UseSSL }}websecure{{ else }}web{{ end }}"]
+      entryPoints = ["stf-web"]
       service = "api@internal"
       {{ if .UseSSL -}}
       middlewares = ["whitelist"]
       {{ end -}}
     {{ end -}}
-    {{ $ssl := .UseSSL -}}
-    {{ range $svcName, $svcAttrs := .Services }}
+    {{ range $idx, $svc := .Services }}
+    {{ range $svcName, $svcAttrs := $svc }}
     [http.routers.{{ $svcName }}]
       rule = "{{ $svcAttrs.Rule }}"
-      entryPoints = ["{{ if $ssl }}websecure{{ else }}web{{ end }}"]
+      entryPoints = ["stf-web"]
       service = "{{ $svcName }}"
       priority = {{ $svcAttrs.Priority }}
       {{ if $svcAttrs.Middlewares -}}
       middlewares = {{ toJson $svcAttrs.Middlewares }}
       {{ end -}}
+    {{- end }}
     {{ end }}
-    {{ range $proxyName, $proxyAttrs := .Proxies }}
+    {{ range $idx, $proxy := .Proxies }}
+    {{ range $proxyName, $proxyAttrs := $proxy }}
     [http.routers.{{ $proxyName }}-proxy]
       rule = "{{ $proxyAttrs.Rule }}"
-      entryPoints = ["proxy"]
+      entryPoints = ["stf-internal-proxy"]
       service = "{{ $proxyName }}"
       priority = {{ $proxyAttrs.Priority }}
-		{{ end }}
+		{{- end }}
+    {{ end }}
 
 [tcp]
 
   [tcp.services]
-    {{ range $svcName, $svcAttrs := .Services -}}
+    {{ range $idx, $svc := .Services }}
+    {{- range $svcName, $svcAttrs := $svc -}}
     {{- if $svcAttrs.IsProvider }}
     {{- range $idx, $ep := $svcAttrs.Endpoints }}
     [[tcp.services.{{ $svcName }}.loadBalancer.servers]]
@@ -123,15 +129,18 @@ var traefikDynamicConfigTmpl = template.Must(
     {{- end }}
     {{- end }}
     {{- end }}
+    {{- end }}
 
   [tcp.routers]
     {{ $backtick := .Backtick -}}
-    {{ range $svcName, $svcAttrs := .Services -}}
+    {{ range $idx, $svc := .Services }}
+    {{ range $svcName, $svcAttrs := $svc -}}
     {{ if $svcAttrs.IsProvider }}
     [tcp.routers.{{ $svcName }}]
       service = "{{ $svcName }}"
       entrypoints = ["{{ $svcName }}"]
       rule = "HostSNI({{ $backtick }}*{{ $backtick }})"
+    {{ end -}}
     {{ end -}}
     {{ end }}
 

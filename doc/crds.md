@@ -1046,7 +1046,7 @@ self-signed certificate. Should only be done for testing.
 </tr>
 <tr class="even">
 <td><code>issuerRef</code> <em><a href="https://godoc.org/github.com/jetstack/cert-manager/pkg/apis/meta/v1#ObjectReference">github.com/jetstack/cert-manager/pkg/apis/meta/v1.ObjectReference</a></em></td>
-<td><p>(WIP) A cert-manager issuer reference to use to provision a TLS secret.</p></td>
+<td><p>A cert-manager issuer reference to use to provision a TLS secret.</p></td>
 </tr>
 <tr class="odd">
 <td><code>external</code> <em>bool</em></td>
@@ -1136,8 +1136,16 @@ deployment.
 <td><p>The version of traefik to run, only &gt;2.0 supported. Defaults to 2.2.0.</p></td>
 </tr>
 <tr class="odd">
+<td><code>annotations</code> <em>map[string]string</em></td>
+<td><p>Extra annotations to apply to the traefik service</p></td>
+</tr>
+<tr class="even">
 <td><code>serviceType</code> <em>string</em></td>
 <td><p>The type of service to create for Traefik. Defaults to LoadBalancer. If using external SSL from a pre-existing ingress controller, you’ll want to set this to ClusterIP.</p></td>
+</tr>
+<tr class="odd">
+<td><code>serviceNames</code> <em>[]string</em></td>
+<td><p>A list of optional service names to route to traefik from inside the cluster</p></td>
 </tr>
 <tr class="even">
 <td><code>accessLogs</code> <em>bool</em></td>
@@ -1252,4 +1260,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `19b3f11`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `830ed95`.*

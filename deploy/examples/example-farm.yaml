@@ -87,7 +87,11 @@ spec:
           # traefik dashboard at a seperate hostname than STF.
           host: "traefik.kind.local"
       # Set up self-signed tls
-      tls: {}
+      tls:
+        issuerRef:
+          name: cluster-selfsigner
+          kind: ClusterIssuer
+
   # Device groups - Each group gets a dedicated provider and adb server
   deviceGroups:
 
@@ -97,6 +101,7 @@ spec:
       # configured above.
       provider:
         startPort: 16000
+        clusterLocalADB: true
       # Use the host USB device on `kind-worker` for this group
       hostUSB:
         nodeName: kind-worker

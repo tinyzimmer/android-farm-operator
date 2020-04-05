@@ -16,26 +16,26 @@ const (
 const (
 	// CreationSpecAnnotation contains the serialized creation spec of a resource
 	// to be compared against desired state.
-	CreationSpecAnnotation = "android.tinyzimmer.com/creation-spec"
+	CreationSpecAnnotation = "android.stf.io/creation-spec"
 	// STFProviderAnnotation contains a reference to the stf-provider instance
 	// that manages a device.
-	STFProviderAnnotation = "android.tinyzimmer.com/stf-provider"
+	STFProviderAnnotation = "android.stf.io/stf-provider"
 	// ADBConnectedAnnotation is used to signal that a device is connected to
 	// its ADB server.
-	ADBConnectedAnnotation = "android.tinyzimmer.com/adb-connected"
+	ADBConnectedAnnotation = "android.stf.io/adb-connected"
 	// BootCompletedAnnotation is used to signal that a device has completed its
 	// boot process.
-	BootCompletedAnnotation = "android.tinyzimmer.com/boot-completed"
+	BootCompletedAnnotation = "android.stf.io/boot-completed"
 	// ConfigMapSHAAnnotation is used to store the checksum of the configmap data
 	// used when a deployment was created. If a deployment is reconciled with a new
 	// checksum, it means its configuration has changed and pods need to be cycled.
-	ConfigMapSHAAnnotation = "android.tinyzimmer.com/configmap-checksum"
+	ConfigMapSHAAnnotation = "android.stf.io/configmap-checksum"
 	// DeviceConfigSHAAnnotation is used to store the checksum of the configuration
 	// used to provision a given device instance.
-	DeviceConfigSHAAnnotation = "android.tinyzimmer.com/device-config-checksum"
+	DeviceConfigSHAAnnotation = "android.stf.io/device-config-checksum"
 	// ProviderSerialAnnotation contains the name of a device as known by its
 	// stf provider.
-	ProviderSerialAnnotation = "android.tinyzimmer.com/stf-serial"
+	ProviderSerialAnnotation = "android.stf.io/stf-serial"
 )
 
 // Defaults and other static vars

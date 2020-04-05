@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	cm "github.com/jetstack/cert-manager/pkg/apis/certmanager/v1alpha3"
+	cmmeta "github.com/jetstack/cert-manager/pkg/apis/meta/v1"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/errors"
 	appsv1 "k8s.io/api/apps/v1"
@@ -74,13 +76,11 @@ func ReconcileService(reqLogger logr.Logger, c client.Client, svc *corev1.Servic
 	// Check the found service spec
 	if !CreationSpecsEqual(svc.ObjectMeta, found.ObjectMeta) {
 		// We need to update the service
-		reqLogger.Info("Service annotation spec has changed, updating", "Service.Name", svc.Name, "Service.Namespace", svc.Namespace)
-		svc.Spec.ClusterIP = found.Spec.ClusterIP
-		found.Spec = svc.Spec
-		if err := c.Update(context.TODO(), found); err != nil {
+		reqLogger.Info("Service annotation spec has changed, deleting and requeing", "Service.Name", svc.Name, "Service.Namespace", svc.Namespace)
+		if err := c.Delete(context.TODO(), found); err != nil {
 			return err
 		}
-		return nil
+		return errors.NewRequeueError("Deleted service definition, requeueing", 2)
 	}
 
 	return nil
@@ -272,6 +272,50 @@ func ReconcileStatefulSet(reqLogger logr.Logger, c client.Client, ss *appsv1.Sta
 		if err := c.Update(context.TODO(), found); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func ReconcileCertificate(reqLogger logr.Logger, c client.Client, cert *cm.Certificate, wait bool) error {
+	if err := SetCreationSpecAnnotation(&cert.ObjectMeta, cert); err != nil {
+		return err
+	}
+
+	found := &cm.Certificate{}
+	if err := c.Get(context.TODO(), types.NamespacedName{Name: cert.Name, Namespace: cert.Namespace}, found); err != nil {
+		// Return API error
+		if client.IgnoreNotFound(err) != nil {
+			return err
+		}
+		// Create the certificate
+		if err := c.Create(context.TODO(), cert); err != nil {
+			return err
+		}
+		if wait {
+			return errors.NewRequeueError("Requeueing status check for new certificate", 3)
+		}
+		return nil
+	}
+
+	// Check the found certificate spec
+	if !CreationSpecsEqual(cert.ObjectMeta, found.ObjectMeta) {
+		// We need to update the certificate
+		found.Spec = cert.Spec
+		if err := c.Update(context.TODO(), found); err != nil {
+			return err
+		}
+	}
+
+	if wait {
+		for _, condition := range found.Status.Conditions {
+			if condition.Type == cm.CertificateConditionReady {
+				if condition.Status == cmmeta.ConditionTrue {
+					return nil
+				}
+			}
+		}
+		return errors.NewRequeueError("Certificate is not ready yet", 3)
 	}
 
 	return nil

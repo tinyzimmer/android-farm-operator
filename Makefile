@@ -142,6 +142,12 @@ test-ingress:
 	kubectl --context kind-kind create secret generic -n metallb-system memberlist --from-literal=secretkey="`openssl rand -base64 128`" || echo
 	echo "$$METALLB_CONFIG" | kubectl --context kind-kind apply -f -
 
+CERT_MANAGER_VERSION ?= v0.14.1
+test-certmanager:
+	kubectl apply --context kind-kind --validate=false -f https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
+	kubectl --context kind-kind wait pod -l app=webhook -n cert-manager --for=condition=Ready
+	echo "$$SELF_SIGNER" | kubectl apply --context kind-kind -f -
+
 # # Deploys a stand alone traefik into the cluster
 # traefik:
 # 	helm repo add traefik https://containous.github.io/traefik-helm-chart
