@@ -17,9 +17,10 @@ spec:
   # Global device management policy that will apply to all groups and only
   # allow one emulated device to be booting at a time
   deviceManagementPolicy:
-    # Only allow x boots at a time, in numerical order. This is currently the only
-    # supported policy.
-    podManagementPolicy: OrderedReady
+    # Only allow x boots at a time, in numerical order, per device group. This is
+    # currently the only supported policy. The amount of boots that will be allowed
+    # at a time will be equal to `{concurrency} * {length(deviceGroups)}`.
+    podManagementPolicy: GroupedOrderedReady
     # Only allow one device to be booting at a time - larger bare metal clusters
     # can handle higher concurrency, but the android boot process is very cpu
     # intensive.
@@ -36,12 +37,16 @@ spec:
     appHostname: "stf.kind.local"
     # The secret above with our application secret
     secret: stf-secrets
+    # For the traefik deployment and usb-host-device adb servers, the pods need
+    # to run with extra privileges. If your cluster requires privileged pods
+    # to be validated against a pod security policy, set this to a service account
+    # that can use that policy.
+    serviceAccount: ""
     # STF Image to use
     stfImage:
       # The recent latest image works best and doesn't run as root. I need to go back
       # on the privilegedDeployments stuff and clean up container security contexts.
       image: openstf/stf:latest
-      imagePullPolicy: IfNotPresent
     # ADB configuration options
     adb:
       # Source for this image is in this repository - it runs an ADB server in the

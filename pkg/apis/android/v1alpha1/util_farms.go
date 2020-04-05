@@ -57,7 +57,7 @@ func (a *AndroidFarm) GetGroupADBAdvertiseURL(group *DeviceGroup) string {
 // mnanagement policy. Currently there is only "OrderedReady".
 func (d *DeviceManagementPolicy) GetPodManagementPolicy() PodManagementPolicy {
 	if d.PodManagementPolicy == "" {
-		return OrderedReady
+		return GroupedOrderedReady
 	}
 	return d.PodManagementPolicy
 }

@@ -994,7 +994,8 @@ spec:
                 serviceAccount:
                   description: A kubernetes service account to attach to OpenSTF deployments.
                     This can be required if you are launching privileged pods that
-                    need to be validated against a PodSecurityPolicy.
+                    need to be validated against a PodSecurityPolicy, e.g. for host
+                    usb devices.
                   type: string
                 stfImage:
                   description: The docker image configuration to use for the STF services.

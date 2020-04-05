@@ -817,7 +817,7 @@ this AndroidFarm.
 </tr>
 <tr class="even">
 <td><code>serviceAccount</code> <em>string</em></td>
-<td><p>A kubernetes service account to attach to OpenSTF deployments. This can be required if you are launching privileged pods that need to be validated against a PodSecurityPolicy.</p></td>
+<td><p>A kubernetes service account to attach to OpenSTF deployments. This can be required if you are launching privileged pods that need to be validated against a PodSecurityPolicy, e.g. for host usb devices.</p></td>
 </tr>
 <tr class="odd">
 <td><code>namespace</code> <em>string</em></td>
@@ -1252,4 +1252,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `733bb81`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `19b3f11`.*

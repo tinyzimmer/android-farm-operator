@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/errors"
-	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

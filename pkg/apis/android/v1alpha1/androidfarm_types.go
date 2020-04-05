@@ -9,7 +9,7 @@ import (
 type PodManagementPolicy string
 
 const (
-	OrderedReady PodManagementPolicy = "OrderedReady"
+	GroupedOrderedReady PodManagementPolicy = "GroupedOrderedReady"
 )
 
 // AndroidFarmSpec defines the desired state of AndroidFarm
@@ -111,7 +111,7 @@ type STFConfig struct {
 	STFSecretKey string `json:"stfSecretKey,omitempty"`
 	// A kubernetes service account to attach to OpenSTF deployments. This can be
 	// required if you are launching privileged pods that need to be validated against
-	// a PodSecurityPolicy.
+	// a PodSecurityPolicy, e.g. for host usb devices.
 	ServiceAccount string `json:"serviceAccount,omitempty"`
 	// The namespace to provision the STF deployments in. Defaults to the default
 	// namespace.

@@ -12,7 +12,7 @@ imagePullSecrets: []
 
 operator:
   # A WIP API server that runs on the operator allowing for device interactions
-  # that STF doesn't provide. Can't decide if I'll actually finish.
+  # that the STF API doesn't provide. Can't decide if I'll actually finish.
   api:
     enabled: false
 
