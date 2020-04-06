@@ -55,7 +55,7 @@ func (r *STFReconciler) reconcileGroupProvider(reqLogger logr.Logger, instance *
 	name := group.GetProviderName()
 
 	builder := builders.NewDeploymentBuilder(reqLogger, instance, name).
-		WithResourceRequirements(instance.STFConfig().ProviderResourceRequirements()).
+		WithResourceRequirements(instance.STFConfig().ProviderResourceRequirements(group)).
 		WithCommand([]string{"/bin/bash", "-c"}).
 		WithArgs([]string{startScript}).
 		WithService("ClusterIP").

@@ -58,6 +58,9 @@ type ProviderConfig struct {
 	PersistDeviceState bool `json:"persistDeviceState,omitempty"`
 	// Configurations for the provider traefik deployment
 	Traefik *TraefikDeployment `json:"traefik,omitempty"`
+	// Resource requirements for this group's provider instance. These will override
+	// any resources set in the global provider configuration.
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 }
 
 // EmulatorConfig is a configuration for virtual emulators running in pods on
@@ -264,7 +267,8 @@ type TLSConfig struct {
 	// Specifies a preexisting TLS secret in the cluster to use. It must follow
 	// the standard format with a tls.crt and tls.key.
 	TLSSecret *corev1.LocalObjectReference `json:"tlsSecret,omitempty"`
-	// A cert-manager issuer reference to use to provision a TLS secret.
+	// A cert-manager issuer reference to use to provision a TLS secret. Currently
+	// requires cert-manager >= v0.14.0.
 	IssuerRef *cmmeta.ObjectReference `json:"issuerRef,omitempty"`
 	// Specify that SSL is managed externally. OpenSTF will be configured to know
 	// it is being served over HTTPS, but you will be responsible for terminating

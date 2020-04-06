@@ -36,6 +36,9 @@ RUN mkdir -p ~/.android/ && touch ~/.android/repositories.cfg && \
 ARG APP_DIR=build/apps
 COPY ${APP_DIR} /opt/sdk/apps
 COPY build/start.sh /opt/sdk/start.sh
-RUN chmod +x /opt/sdk/start.sh && sed -i "s:!platform!:${PLATFORM}:" /opt/sdk/start.sh
+
+RUN groupadd kvm && useradd -d /home/app -G kvm -m -r app && \
+    chmod +x /opt/sdk/start.sh && \
+    sed -i "s:!platform!:${PLATFORM}:" /opt/sdk/start.sh
 
 CMD /opt/sdk/start.sh

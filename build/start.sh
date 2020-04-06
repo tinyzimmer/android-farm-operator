@@ -66,7 +66,7 @@ if [[ "${EMULATOR_ENABLE_PLAYSTORE,,}" == "true" ]] ; then
 fi
 
 # Remove any stale locks
-find /root/.android/avd -name *lock -exec rm {} \;
+find "${HOME}/.android/avd" -name *lock -exec rm {} \;
 
 # Start the emulator
 ${EMULATOR_ROOT}/qemu/linux-x86_64/qemu-system-x86_64-headless \
@@ -96,7 +96,8 @@ adb wait-for-device
 if [[ "$(ls /opt/sdk/apps/)" != "" ]]; then
   for i in /opt/sdk/apps/*.apk ; do
     pkg_search=$(basename $i | cut -d '.' -f1)
-    adb shell "pm list packages" | grep "${pkg_search}" || adb install -r "$i"
+    adb shell "pm list packages" | grep "${pkg_search}" | cut -d ':' -f2 | xargs adb uninstall || true
+    adb install -r "${i}"
   done
 fi
 

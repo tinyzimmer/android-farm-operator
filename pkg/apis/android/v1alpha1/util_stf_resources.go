@@ -61,7 +61,10 @@ func (s *STFConfig) ProcessorResourceRequirements() corev1.ResourceRequirements 
 	return defaultRequirements
 }
 
-func (s *STFConfig) ProviderResourceRequirements() corev1.ResourceRequirements {
+func (s *STFConfig) ProviderResourceRequirements(group *DeviceGroup) corev1.ResourceRequirements {
+	if group.Provider != nil && group.Provider.Resources != nil {
+		return *group.Provider.Resources
+	}
 	if s.Provider != nil {
 		if s.Provider.Resources != nil {
 			return *s.Provider.Resources

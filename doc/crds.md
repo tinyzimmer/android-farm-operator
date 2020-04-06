@@ -704,6 +704,10 @@ deployments
 <td><code>traefik</code> <em><a href="#android.stf.io/v1alpha1.TraefikDeployment">TraefikDeployment</a></em></td>
 <td><p>Configurations for the provider traefik deployment</p></td>
 </tr>
+<tr class="even">
+<td><code>resources</code> <em><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#resourcerequirements-v1-core">Kubernetes core/v1.ResourceRequirements</a></em></td>
+<td><p>Resource requirements for this group’s provider instance. These will override any resources set in the global provider configuration.</p></td>
+</tr>
 </tbody>
 </table>
 
@@ -1054,7 +1058,7 @@ self-signed certificate. Should only be done for testing.
 </tr>
 <tr class="even">
 <td><code>issuerRef</code> <em><a href="https://godoc.org/github.com/jetstack/cert-manager/pkg/apis/meta/v1#ObjectReference">github.com/jetstack/cert-manager/pkg/apis/meta/v1.ObjectReference</a></em></td>
-<td><p>A cert-manager issuer reference to use to provision a TLS secret.</p></td>
+<td><p>A cert-manager issuer reference to use to provision a TLS secret. Currently requires cert-manager &gt;= v0.14.0.</p></td>
 </tr>
 <tr class="odd">
 <td><code>external</code> <em>bool</em></td>
@@ -1266,4 +1270,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `98d0d61`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `56a0311`.*

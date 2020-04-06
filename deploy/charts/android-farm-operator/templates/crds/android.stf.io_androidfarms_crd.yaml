@@ -548,6 +548,27 @@ spec:
                         description: Set to true to persist device state (apps, accounts,
                           caches) between user sessions.
                         type: boolean
+                      resources:
+                        description: Resource requirements for this group's provider
+                          instance. These will override any resources set in the global
+                          provider configuration.
+                        properties:
+                          limits:
+                            additionalProperties:
+                              type: string
+                            description: 'Limits describes the maximum amount of compute
+                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                            type: object
+                          requests:
+                            additionalProperties:
+                              type: string
+                            description: 'Requests describes the minimum amount of
+                              compute resources required. If Requests is omitted for
+                              a container, it defaults to Limits if that is explicitly
+                              specified, otherwise to an implementation-defined value.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                            type: object
+                        type: object
                       startPort:
                         description: The starting port to use for provider services.
                           Defaults to 15000. If specifying multiple device groups,
@@ -1323,7 +1344,7 @@ spec:
                           type: boolean
                         issuerRef:
                           description: A cert-manager issuer reference to use to provision
-                            a TLS secret.
+                            a TLS secret. Currently requires cert-manager >= v0.14.0.
                           properties:
                             group:
                               type: string
