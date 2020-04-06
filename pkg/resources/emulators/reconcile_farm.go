@@ -1,10 +1,10 @@
 package emulators
 
 import (
+	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/resources"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util"
-	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,7 +34,7 @@ func (r *EmulatorFarmReconciler) Reconcile(reqLogger logr.Logger, instance *andr
 		// If it's an emulated device group, reconcile the emulator devices
 		if group.IsEmulatedGroup() {
 			logger := reqLogger.WithValues("Group", group.Name, "Namespace", group.GetNamespace())
-			logger.Info("Device group has an emulated device configuration, reconciling pods")
+			logger.Info("Device group has an emulated device configuration, reconciling devices")
 			if err := r.ReconcileEmulatedDeviceGroup(logger, instance, group); err != nil {
 				return err
 			}

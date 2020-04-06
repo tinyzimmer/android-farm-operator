@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"html/template"
-	"strconv"
 
 	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -126,7 +125,7 @@ func (f *DeviceGroup) GetConfig(c client.Client) (*AndroidDeviceConfig, error) {
 
 // GetHostname returns the device hostname for a device in this group at the given
 // index.
-func (f *DeviceGroup) GetHostname(logger logr.Logger, idx int32) string {
+func (f *DeviceGroup) GetHostname(logger logr.Logger, idxStr string) string {
 	if f.Emulators.HostnameTemplate == "" {
 		return ""
 	}
@@ -137,7 +136,7 @@ func (f *DeviceGroup) GetHostname(logger logr.Logger, idx int32) string {
 	}
 	var buf bytes.Buffer
 	err = t.Execute(&buf, map[string]string{
-		"Index": strconv.Itoa(int(idx)),
+		"Index": idxStr,
 	})
 	if err != nil {
 		logger.Error(err, "Failed to execute hostname template, falling back to k8s default")

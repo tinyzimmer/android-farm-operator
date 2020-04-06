@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -75,4 +76,12 @@ func GetPodADBPort(pod corev1.Pod) (int32, error) {
 		}
 	}
 	return 0, fmt.Errorf("Could not determine ADB port for device: %s/%s", pod.Namespace, pod.Name)
+}
+
+func DeviceIntToString(i int) string {
+	return fmt.Sprintf("%02d", i)
+}
+
+func IntFromDeviceString(s string) (int, error) {
+	return strconv.Atoi(strings.TrimLeft(s, "0"))
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
+	"github.com/tinyzimmer/android-farm-operator/pkg/util"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,7 +30,7 @@ func groupIndexReadyToCreate(c client.Client, group *androidv1alpha1.DeviceGroup
 	pending := int32(0)
 	for i := int32(0); i < devidx; i++ {
 		// Look up the device at this index
-		devName := fmt.Sprintf("%s-%d", group.Name, i)
+		devName := fmt.Sprintf("%s-%s", group.Name, util.DeviceIntToString(int(i)))
 		nn := types.NamespacedName{Name: devName, Namespace: group.GetNamespace()}
 		found := &androidv1alpha1.AndroidDevice{}
 		if err := c.Get(context.TODO(), nn, found); err != nil {
@@ -75,7 +76,7 @@ func groupIndexReadyToUpdateFunc(reqLogger logr.Logger, c client.Client, farm *a
 		// Iterate the devices
 		pending := int32(0)
 		for i := int32(0); i < devidx; i++ {
-			devName := fmt.Sprintf("%s-%d", group.Name, i)
+			devName := fmt.Sprintf("%s-%s", group.Name, util.DeviceIntToString(int(i)))
 			nn := types.NamespacedName{Name: devName, Namespace: group.GetNamespace()}
 			found := &androidv1alpha1.AndroidDevice{}
 			if err := c.Get(context.TODO(), nn, found); err != nil {
