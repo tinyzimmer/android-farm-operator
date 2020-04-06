@@ -3,7 +3,6 @@ package v1alpha1
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"html/template"
 	"strconv"
 
@@ -44,13 +43,6 @@ func (a *AndroidFarm) GetDeviceManagementPolicy(group string) *DeviceManagementP
 		return a.Spec.DeviceManagementPolicy
 	}
 	return nil
-}
-
-func (a *AndroidFarm) GetGroupADBAdvertiseURL(group *DeviceGroup) string {
-	if !group.UseClusterLocalADB() {
-		return a.STFConfig().GetAppHostname()
-	}
-	return fmt.Sprintf("%s.%s.svc", group.GetProviderName(), a.STFConfig().GetNamespace())
 }
 
 // GetPodManagementPolicy returns the pod management policy for the device

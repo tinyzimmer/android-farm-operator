@@ -9,6 +9,7 @@ import (
 	"github.com/go-logr/logr"
 	androidv1alpha1 "github.com/tinyzimmer/android-farm-operator/pkg/apis/android/v1alpha1"
 	"github.com/tinyzimmer/android-farm-operator/pkg/util/builders"
+	stfutil "github.com/tinyzimmer/android-farm-operator/pkg/util/stf"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -152,7 +153,7 @@ func getGroupStartScript(instance *androidv1alpha1.AndroidFarm, group *androidv1
 		"TriproxyDev":      fmt.Sprintf("%s-triproxy-dev", instance.STFNamePrefix()),
 		"HTTPScheme":       instance.STFConfig().GetHTTPScheme(),
 		"WebsocketScheme":  instance.STFConfig().GetWebsocketScheme(),
-		"ProviderHostname": instance.GetGroupADBAdvertiseURL(group),
+		"ProviderHostname": stfutil.GetGroupADBAdvertiseURL(instance, group),
 		"MinPort":          strconv.Itoa(int(group.GetProviderStartPort())),
 		"MaxPort":          strconv.Itoa(int(getProviderMaxPort(group.GetProviderStartPort(), deviceCount))),
 		"StorageURL":       instance.InternalStorageURL(),

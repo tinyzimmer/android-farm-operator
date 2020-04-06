@@ -36,3 +36,10 @@ func TriproxyEndpoint(a *androidv1alpha1.AndroidFarm, component string) string {
 		util.GetClusterSuffix(),
 	)
 }
+
+func GetGroupADBAdvertiseURL(farm *androidv1alpha1.AndroidFarm, group *androidv1alpha1.DeviceGroup) string {
+	if !group.UseClusterLocalADB() {
+		return farm.STFConfig().GetAppHostname()
+	}
+	return fmt.Sprintf("%s-%s-traefik.%s.svc.%s", farm.STFNamePrefix(), group.GetProviderName(), farm.STFConfig().GetNamespace(), util.GetClusterSuffix())
+}
