@@ -65,12 +65,6 @@ func reconcileIngressDeployment(reqLogger logr.Logger, c client.Client, instance
 		}).
 		WithPodSecurityContext(instance.STFConfig().PodSecurityContext()).
 		WithServiceAnnotations(instance.STFConfig().TraefikServiceAnnotations()).
-		// WithContainerSecurityContext(&corev1.SecurityContext{
-		// 	Capabilities: &corev1.Capabilities{
-		// 		Drop: []corev1.Capability{"ALL"},
-		// 		Add:  []corev1.Capability{"NET_BIND_SERVICE"},
-		// 	},
-		// }).
 		WithPort("stf-internal", 8880)
 
 	if instance.STFConfig().TLSEnabled() {

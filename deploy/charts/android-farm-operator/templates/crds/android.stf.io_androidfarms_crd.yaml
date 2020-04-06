@@ -534,7 +534,16 @@ spec:
                         description: When set to true, the provider will advertise
                           it's cluster local service address for adb connections.
                           The default behavior is to advertise the external app hostname.
+                          This ultimately affects where tcp routes to the adb ports
+                          are setup from. If not using cluster local adb - they are
+                          set up on the main traefik instance and the provider traefik
+                          instance. If using cluster-local adb they are only set up
+                          on the provider traefik instance.
                         type: boolean
+                      hostnameOverride:
+                        description: Override the public hostname to advertise on
+                          provider instances
+                        type: string
                       persistDeviceState:
                         description: Set to true to persist device state (apps, accounts,
                           caches) between user sessions.
@@ -546,6 +555,69 @@ spec:
                           they are not able to overlap. (~4 ports per device)
                         format: int32
                         type: integer
+                      traefik:
+                        description: Configurations for the provider traefik deployment
+                        properties:
+                          accessLogs:
+                            description: Set to true if you wish for traefik to produce
+                              access logs
+                            type: boolean
+                          annotations:
+                            additionalProperties:
+                              type: string
+                            description: Extra annotations to apply to the traefik
+                              service
+                            type: object
+                          dashboard:
+                            description: A configuration for the traefik dashboard
+                            properties:
+                              host:
+                                description: The hostname that should route to the
+                                  traefik dashboard.
+                                type: string
+                              ipWhitelist:
+                                description: A list of IP addresses to whitelist for
+                                  dashboard access.
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                            - host
+                            type: object
+                          replicas:
+                            description: The number of traefik instances to run.
+                            format: int32
+                            type: integer
+                          resources:
+                            description: Resource restraints for the traefik deployment
+                            properties:
+                              limits:
+                                additionalProperties:
+                                  type: string
+                                description: 'Limits describes the maximum amount
+                                  of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  type: string
+                                description: 'Requests describes the minimum amount
+                                  of compute resources required. If Requests is omitted
+                                  for a container, it defaults to Limits if that is
+                                  explicitly specified, otherwise to an implementation-defined
+                                  value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                                type: object
+                            type: object
+                          serviceType:
+                            description: The type of service to create for Traefik.
+                              Defaults to LoadBalancer. If using external SSL from
+                              a pre-existing ingress controller, you'll want to set
+                              this to ClusterIP.
+                            type: string
+                          version:
+                            description: The version of traefik to run, only >2.0
+                              supported. Defaults to 2.2.0.
+                            type: string
+                        type: object
                     type: object
                 required:
                 - name
@@ -1227,12 +1299,6 @@ spec:
                                 value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                               type: object
                           type: object
-                        serviceNames:
-                          description: A list of optional service names to route to
-                            traefik from inside the cluster
-                          items:
-                            type: string
-                          type: array
                         serviceType:
                           description: The type of service to create for Traefik.
                             Defaults to LoadBalancer. If using external SSL from a

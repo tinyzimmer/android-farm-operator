@@ -38,6 +38,9 @@ func TriproxyEndpoint(a *androidv1alpha1.AndroidFarm, component string) string {
 }
 
 func GetGroupADBAdvertiseURL(farm *androidv1alpha1.AndroidFarm, group *androidv1alpha1.DeviceGroup) string {
+	if hostname := group.ProviderHostnameOverride(); hostname != "" {
+		return hostname
+	}
 	if !group.UseClusterLocalADB() {
 		return farm.STFConfig().GetAppHostname()
 	}

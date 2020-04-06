@@ -107,16 +107,89 @@ func (s *STFConfig) TraefikDashboardWhitelistString() string {
 	return defaultTraefikWhitelist
 }
 
-func (s *STFConfig) TraefikServiceNames() []string {
-	if s.Traefik != nil && s.Traefik.Deployment != nil && s.Traefik.Deployment.ServiceNames != nil {
-		return s.Traefik.Deployment.ServiceNames
-	}
-	return []string{}
-}
-
+// TraefikServiceAnnotations returns annotations to apply to the traefik service
+// for an stf cluster.
 func (s *STFConfig) TraefikServiceAnnotations() map[string]string {
 	if s.Traefik != nil && s.Traefik.Deployment != nil && s.Traefik.Deployment.Annotations != nil {
 		return s.Traefik.Deployment.Annotations
 	}
 	return map[string]string{}
+}
+
+// ProviderTraefikReplicas returns the number of replicas to run in the traefik
+// deployment for this device group's provider.
+func (g *DeviceGroup) ProviderTraefikReplicas() int32 {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			if g.Provider.Traefik.Replicas != 0 {
+				return g.Provider.Traefik.Replicas
+			}
+		}
+	}
+	return defaultTraefikReplicas
+}
+
+// ProviderTraefikServiceType returns the type of service to use in the traefik
+// deployment for this device group's provider.
+func (g *DeviceGroup) ProviderTraefikServiceType() string {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			if g.Provider.Traefik.ServiceType != "" {
+				return g.Provider.Traefik.ServiceType
+			}
+		}
+	}
+	return defaultTraefikProviderServiceType
+}
+
+// ProviderTraefikDashboardEnabled returns true if we should enable the traefik
+// dashboard on this provider deployment.
+func (g *DeviceGroup) ProviderTraefikDashboardEnabled() bool {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			if g.Provider.Traefik.Dashboard != nil {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// ProviderTraefikAccessLogsEnabled returns true if we should enable the access
+// logs on this provider's traefik instance.
+func (g *DeviceGroup) ProviderTraefikAccessLogsEnabled() bool {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			return g.Provider.Traefik.AccessLogs
+		}
+	}
+	return false
+}
+
+// ProviderTraefikServiceAnnotations returns the annotations to apply to the
+// traefik instance for this device group.
+func (g *DeviceGroup) ProviderTraefikServiceAnnotations() map[string]string {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			if g.Provider.Traefik.Annotations != nil {
+				return g.Provider.Traefik.Annotations
+			}
+		}
+	}
+	return map[string]string{}
+}
+
+// UseClusterLocalADB returns true if we should only set up adb entrypoints on
+// the provider traefik instances, instead of the main one.
+func (g *DeviceGroup) UseClusterLocalADB() bool {
+	return g.Provider != nil && g.Provider.ClusterLocalADB
+}
+
+func (g *DeviceGroup) ProviderHostnameOverride() string {
+	if g.Provider != nil {
+		if g.Provider.HostnameOverride != "" {
+			return g.Provider.HostnameOverride
+		}
+	}
+	return ""
 }

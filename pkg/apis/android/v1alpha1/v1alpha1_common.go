@@ -54,6 +54,8 @@ var (
 	// defaultTraefikWhitelist is the default whitelist to apply to the traefik
 	// dashboard if ssl is enabled on the instance.
 	defaultTraefikWhitelist = `["0.0.0.0/0"]`
+	// The default service type to use for provider traefik instances.
+	defaultTraefikProviderServiceType = "ClusterIP"
 	// defaultRDBProxyReplicas is the default number of rethinkdb proxies to run in
 	// front of the StatefulSets.
 	defaultRDBProxyReplicas int32 = 1

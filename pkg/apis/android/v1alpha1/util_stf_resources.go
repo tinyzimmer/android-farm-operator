@@ -151,3 +151,14 @@ func (s *STFConfig) TraefikResourceRequirements() corev1.ResourceRequirements {
 	}
 	return defaultRequirements
 }
+
+func (g *DeviceGroup) ProviderTraefikResourceRequirements() corev1.ResourceRequirements {
+	if g.Provider != nil {
+		if g.Provider.Traefik != nil {
+			if g.Provider.Traefik.Resources != nil {
+				return *g.Provider.Traefik.Resources
+			}
+		}
+	}
+	return defaultRequirements
+}

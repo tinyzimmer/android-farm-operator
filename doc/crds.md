@@ -690,11 +690,19 @@ deployments
 </tr>
 <tr class="even">
 <td><code>clusterLocalADB</code> <em>bool</em></td>
-<td><p>When set to true, the provider will advertise it’s cluster local service address for adb connections. The default behavior is to advertise the external app hostname.</p></td>
+<td><p>When set to true, the provider will advertise it’s cluster local service address for adb connections. The default behavior is to advertise the external app hostname. This ultimately affects where tcp routes to the adb ports are setup from. If not using cluster local adb - they are set up on the main traefik instance and the provider traefik instance. If using cluster-local adb they are only set up on the provider traefik instance.</p></td>
 </tr>
 <tr class="odd">
+<td><code>hostnameOverride</code> <em>string</em></td>
+<td><p>Override the public hostname to advertise on provider instances</p></td>
+</tr>
+<tr class="even">
 <td><code>persistDeviceState</code> <em>bool</em></td>
 <td><p>Set to true to persist device state (apps, accounts, caches) between user sessions.</p></td>
+</tr>
+<tr class="odd">
+<td><code>traefik</code> <em><a href="#android.stf.io/v1alpha1.TraefikDeployment">TraefikDeployment</a></em></td>
+<td><p>Configurations for the provider traefik deployment</p></td>
 </tr>
 </tbody>
 </table>
@@ -1114,7 +1122,9 @@ dashboard.
 
 ### TraefikDeployment
 
-(*Appears on:* [TraefikConfig](#android.stf.io/v1alpha1.TraefikConfig))
+(*Appears on:*
+[ProviderConfig](#android.stf.io/v1alpha1.ProviderConfig),
+[TraefikConfig](#android.stf.io/v1alpha1.TraefikConfig))
 
 TraefikDeployment represents configuration options for the traefik
 deployment.
@@ -1144,18 +1154,14 @@ deployment.
 <td><p>The type of service to create for Traefik. Defaults to LoadBalancer. If using external SSL from a pre-existing ingress controller, you’ll want to set this to ClusterIP.</p></td>
 </tr>
 <tr class="odd">
-<td><code>serviceNames</code> <em>[]string</em></td>
-<td><p>A list of optional service names to route to traefik from inside the cluster</p></td>
-</tr>
-<tr class="even">
 <td><code>accessLogs</code> <em>bool</em></td>
 <td><p>Set to true if you wish for traefik to produce access logs</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>dashboard</code> <em><a href="#android.stf.io/v1alpha1.TraefikDashboard">TraefikDashboard</a></em></td>
 <td><p>A configuration for the traefik dashboard</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources</code> <em><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#resourcerequirements-v1-core">Kubernetes core/v1.ResourceRequirements</a></em></td>
 <td><p>Resource restraints for the traefik deployment</p></td>
 </tr>
@@ -1260,4 +1266,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `830ed95`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `98d0d61`.*

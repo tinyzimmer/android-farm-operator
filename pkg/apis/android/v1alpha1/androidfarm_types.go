@@ -46,11 +46,18 @@ type ProviderConfig struct {
 	StartPort int32 `json:"startPort,omitempty"`
 	// When set to true, the provider will advertise it's cluster local service
 	// address for adb connections. The default behavior is to advertise the external
-	// app hostname.
+	// app hostname. This ultimately affects where tcp routes to the adb ports
+	// are setup from. If not using cluster local adb - they are set up on the main
+	// traefik instance and the provider traefik instance. If using cluster-local adb
+	// they are only set up on the provider traefik instance.
 	ClusterLocalADB bool `json:"clusterLocalADB,omitempty"`
+	// Override the public hostname to advertise on provider instances
+	HostnameOverride string `json:"hostnameOverride,omitempty"`
 	// Set to true to persist device state (apps, accounts, caches) between user
 	// sessions.
 	PersistDeviceState bool `json:"persistDeviceState,omitempty"`
+	// Configurations for the provider traefik deployment
+	Traefik *TraefikDeployment `json:"traefik,omitempty"`
 }
 
 // EmulatorConfig is a configuration for virtual emulators running in pods on
@@ -332,8 +339,6 @@ type TraefikDeployment struct {
 	// If using external SSL from a pre-existing ingress controller, you'll want to
 	// set this to ClusterIP.
 	ServiceType string `json:"serviceType,omitempty"`
-	// A list of optional service names to route to traefik from inside the cluster
-	ServiceNames []string `json:"serviceNames,omitempty"`
 	// Set to true if you wish for traefik to produce access logs
 	AccessLogs bool `json:"accessLogs,omitempty"`
 	// A configuration for the traefik dashboard

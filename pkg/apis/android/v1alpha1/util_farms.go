@@ -63,10 +63,6 @@ func (d *DeviceManagementPolicy) GetConcurrency() int32 {
 	return d.Concurrency
 }
 
-func (g *DeviceGroup) UseClusterLocalADB() bool {
-	return g.Provider != nil && g.Provider.ClusterLocalADB
-}
-
 // MatchingLabels returns the selector for finding devices/pods in this
 // device group.
 func (g *DeviceGroup) MatchingLabels() client.MatchingLabels {

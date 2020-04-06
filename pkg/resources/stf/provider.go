@@ -96,7 +96,7 @@ func (r *STFReconciler) reconcileGroupProviderTraefik(reqLogger logr.Logger, ins
 	var static bytes.Buffer
 	if err := providerTraefikStaticConfigTmpl.Execute(&static, map[string]interface{}{
 		"Services":  providerDefs,
-		"AccessLog": instance.STFConfig().TraefikAccessLogsEnabled(),
+		"AccessLog": group.ProviderTraefikAccessLogsEnabled(),
 		"Backtick":  "`",
 	}); err != nil {
 		return err
@@ -111,21 +111,18 @@ func (r *STFReconciler) reconcileGroupProviderTraefik(reqLogger logr.Logger, ins
 
 	builder := builders.NewDeploymentBuilder(reqLogger, instance, fmt.Sprintf("%s-traefik", group.GetProviderName())).
 		WithImage(instance.STFConfig().TraefikImage()).
+		WithReplicas(group.ProviderTraefikReplicas()).
+		WithResourceRequirements(group.ProviderTraefikResourceRequirements()).
 		WithFile("config.toml", static.String()).
 		WithFile("routes/stf.toml", dynamic.String()).
 		WithCommand([]string{"traefik"}).
 		WithArgs([]string{
 			"--configfile", "/etc/configmap/config.toml",
 		}).
-		WithService("ClusterIP").
+		WithService(group.ProviderTraefikServiceType()).
+		WithServiceAnnotations(group.ProviderTraefikServiceAnnotations()).
 		WithPort("web", 8088).
 		WithPodSecurityContext(instance.STFConfig().PodSecurityContext())
-		// WithContainerSecurityContext(&corev1.SecurityContext{
-		// 	Capabilities: &corev1.Capabilities{
-		// 		Drop: []corev1.Capability{"ALL"},
-		// 		Add:  []corev1.Capability{"NET_BIND_SERVICE"},
-		// 	},
-		// })
 
 	for _, svc := range providerDefs {
 		for svcName, svcAttrs := range svc {
