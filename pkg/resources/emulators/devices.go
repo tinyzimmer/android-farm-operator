@@ -12,10 +12,11 @@ import (
 // newEmulatedDeviceForFarmGroup returns an AndroidDevice configuration for a farm
 // group at the given index. If STF is being used for this farm, we also add
 // STF annotations.
+// TODO: Use a better utility function for the provider fqdn
 func newEmulatedDeviceForFarmGroup(logger logr.Logger, farm *androidv1alpha1.AndroidFarm, idx int32, group *androidv1alpha1.DeviceGroup, checksum string) *androidv1alpha1.AndroidDevice {
 	annotations := make(map[string]string)
 	if !farm.STFDisabled() {
-		annotations[androidv1alpha1.STFProviderAnnotation] = fmt.Sprintf("%s.%s.svc", group.GetProviderName(), farm.STFConfig().GetNamespace())
+		annotations[androidv1alpha1.STFProviderAnnotation] = fmt.Sprintf("%s-%s.%s.svc", farm.STFNamePrefix(), group.GetProviderName(), farm.STFConfig().GetNamespace())
 	}
 	annotations[androidv1alpha1.DeviceConfigSHAAnnotation] = checksum
 	return &androidv1alpha1.AndroidDevice{
