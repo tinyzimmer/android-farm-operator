@@ -87,10 +87,7 @@ spec:
           # traefik dashboard at a seperate hostname than STF.
           host: "traefik.kind.local"
       # Set up self-signed tls
-      tls:
-        issuerRef:
-          name: cluster-selfsigner
-          kind: ClusterIssuer
+      tls: {}
 
   # Device groups - Each group gets a dedicated provider and adb server
   deviceGroups:
