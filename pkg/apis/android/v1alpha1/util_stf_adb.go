@@ -79,21 +79,23 @@ func (s *STFConfig) ADBContainerSecurityContext(group *DeviceGroup) *corev1.Secu
 }
 
 // ADBImage returns the image to use for adb servers in this farm.
-func (s *STFConfig) ADBImage() string {
-	if s.ADB != nil {
-		if s.ADB.Image != "" {
-			return s.ADB.Image
-		}
+func (s *STFConfig) ADBImage(group *DeviceGroup) string {
+	if group.ADB != nil && group.ADB.Image != "" {
+		return group.ADB.Image
+	}
+	if s.ADB != nil && s.ADB.Image != "" {
+		return s.ADB.Image
 	}
 	return "quay.io/tinyzimmer/adbmon:latest"
 }
 
 // ADBImagePullPolicy returns the pull policy for adb images in this farm
-func (s *STFConfig) ADBImagePullPolicy() corev1.PullPolicy {
-	if s.ADB != nil {
-		if s.ADB.ImagePullPolicy != "" {
-			return s.ADB.ImagePullPolicy
-		}
+func (s *STFConfig) ADBImagePullPolicy(group *DeviceGroup) corev1.PullPolicy {
+	if group.ADB != nil && group.ADB.ImagePullPolicy != "" {
+		return group.ADB.ImagePullPolicy
+	}
+	if s.ADB != nil && s.ADB.ImagePullPolicy != "" {
+		return s.ADB.ImagePullPolicy
 	}
 	return corev1.PullIfNotPresent
 }
@@ -102,11 +104,11 @@ func (s *STFConfig) ADBImagePullPolicy() corev1.PullPolicy {
 func (s *STFConfig) ADBSidecarContainer(providerName string, group *DeviceGroup) corev1.Container {
 	container := corev1.Container{
 		Name:            "adb",
-		ImagePullPolicy: s.ADBImagePullPolicy(),
-		Image:           s.ADBImage(),
+		ImagePullPolicy: s.ADBImagePullPolicy(group),
+		Image:           s.ADBImage(group),
 		Ports:           []corev1.ContainerPort{{Name: "adb-server", ContainerPort: 5037}},
 		SecurityContext: s.ADBContainerSecurityContext(group),
-		Resources:       s.ADBResourceRequirements(),
+		Resources:       s.ADBResourceRequirements(group),
 		Env: []corev1.EnvVar{
 			{
 				Name:  "HOME",

@@ -52,7 +52,8 @@ Resource Types:
 
 ### ADBConfig
 
-(*Appears on:* [STFConfig](#android.stf.io/v1alpha1.STFConfig))
+(*Appears on:* [DeviceGroup](#android.stf.io/v1alpha1.DeviceGroup),
+[STFConfig](#android.stf.io/v1alpha1.STFConfig))
 
 ADBConfig represents configuration options for the adb containers
 
@@ -509,14 +510,18 @@ common configuration.
 <td><p>STF provider configurations for this device group.</p></td>
 </tr>
 <tr class="odd">
+<td><code>adb</code> <em><a href="#android.stf.io/v1alpha1.ADBConfig">ADBConfig</a></em></td>
+<td><p>ADB configurations for this device group</p></td>
+</tr>
+<tr class="even">
 <td><code>emulators</code> <em><a href="#android.stf.io/v1alpha1.EmulatorConfig">EmulatorConfig</a></em></td>
 <td><p>A configuration for emulated devices running in pods on the kubernetes cluster</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>hostUSB</code> <em><a href="#android.stf.io/v1alpha1.HostUSBConfig">HostUSBConfig</a></em></td>
 <td><p>A configuration for connecting host usb devices to the AndroidFarm.</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>omitFromSTF</code> <em>bool</em></td>
 <td><p>TODO: implement</p></td>
 </tr>
@@ -841,7 +846,7 @@ this AndroidFarm.
 </tr>
 <tr class="odd">
 <td><code>adb</code> <em><a href="#android.stf.io/v1alpha1.ADBConfig">ADBConfig</a></em></td>
-<td><p>ADB extra configuration options</p></td>
+<td><p>ADB global configuration options - can be overridden on the device group level</p></td>
 </tr>
 <tr class="even">
 <td><code>api</code> <em><a href="#android.stf.io/v1alpha1.APIConfig">APIConfig</a></em></td>
@@ -861,7 +866,7 @@ this AndroidFarm.
 </tr>
 <tr class="even">
 <td><code>provider</code> <em><a href="#android.stf.io/v1alpha1.GlobalProviderConfig">GlobalProviderConfig</a></em></td>
-<td><p>Provider configuration options</p></td>
+<td><p>Provider global configuration options - can be overridden on the device group level</p></td>
 </tr>
 <tr class="odd">
 <td><code>reaper</code> <em><a href="#android.stf.io/v1alpha1.ReaperConfig">ReaperConfig</a></em></td>
@@ -1270,4 +1275,4 @@ deployments
 
 ------------------------------------------------------------------------
 
-*Generated with `gen-crd-api-reference-docs` on git commit `13f8ccb`.*
+*Generated with `gen-crd-api-reference-docs` on git commit `9dc9099`.*

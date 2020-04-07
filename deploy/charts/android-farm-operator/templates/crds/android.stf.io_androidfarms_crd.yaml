@@ -38,6 +38,52 @@ spec:
                 description: DeviceGroup represents a collection of android devices
                   that share a common configuration.
                 properties:
+                  adb:
+                    description: ADB configurations for this device group
+                    properties:
+                      image:
+                        description: Image for the adb servers. Defaults to `quay.io/tinyzimmer/adbmon`.
+                          Source in this repository.
+                        type: string
+                      imagePullPolicy:
+                        description: The pull policy to attach to deployments using
+                          this image.
+                        type: string
+                      imagePullSecrets:
+                        description: Any pull secrets required for downloading the
+                          image.
+                        items:
+                          description: LocalObjectReference contains enough information
+                            to let you locate the referenced object inside the same
+                            namespace.
+                          properties:
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                          type: object
+                        type: array
+                      resources:
+                        description: The resource restraints for the provider adb
+                          sidecars.
+                        properties:
+                          limits:
+                            additionalProperties:
+                              type: string
+                            description: 'Limits describes the maximum amount of compute
+                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                            type: object
+                          requests:
+                            additionalProperties:
+                              type: string
+                            description: 'Requests describes the minimum amount of
+                              compute resources required. If Requests is omitted for
+                              a container, it defaults to Limits if that is explicitly
+                              specified, otherwise to an implementation-defined value.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                            type: object
+                        type: object
+                    type: object
                   emulators:
                     description: A configuration for emulated devices running in pods
                       on the kubernetes cluster
@@ -661,7 +707,8 @@ spec:
               description: The configuration for the OpenSTF Deployment
               properties:
                 adb:
-                  description: ADB extra configuration options
+                  description: ADB global configuration options - can be overridden
+                    on the device group level
                   properties:
                     image:
                       description: Image for the adb servers. Defaults to `quay.io/tinyzimmer/adbmon`.
@@ -853,7 +900,8 @@ spec:
                       type: object
                   type: object
                 provider:
-                  description: Provider configuration options
+                  description: Provider global configuration options - can be overridden
+                    on the device group level
                   properties:
                     resources:
                       description: The resource restraints for the app deployment

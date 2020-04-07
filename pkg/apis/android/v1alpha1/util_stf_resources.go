@@ -16,11 +16,12 @@ func resourceLimits(cpu, memMB int64) corev1.ResourceRequirements {
 
 var defaultRequirements = resourceLimits(100, 256)
 
-func (s *STFConfig) ADBResourceRequirements() corev1.ResourceRequirements {
-	if s.ADB != nil {
-		if s.ADB.Resources != nil {
-			return *s.ADB.Resources
-		}
+func (s *STFConfig) ADBResourceRequirements(group *DeviceGroup) corev1.ResourceRequirements {
+	if group.ADB != nil && group.ADB.Resources != nil {
+		return *group.ADB.Resources
+	}
+	if s.ADB != nil && s.ADB.Resources != nil {
+		return *s.ADB.Resources
 	}
 	return defaultRequirements
 }

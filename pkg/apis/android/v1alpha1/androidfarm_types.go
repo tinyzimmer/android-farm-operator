@@ -31,6 +31,8 @@ type DeviceGroup struct {
 	Name string `json:"name"`
 	// STF provider configurations for this device group.
 	Provider *ProviderConfig `json:"provider,omitempty"`
+	// ADB configurations for this device group
+	ADB *ADBConfig `json:"adb,omitempty"`
 	// A configuration for emulated devices running in pods on the kubernetes cluster
 	Emulators *EmulatorConfig `json:"emulators,omitempty"`
 	// A configuration for connecting host usb devices to the AndroidFarm.
@@ -128,7 +130,7 @@ type STFConfig struct {
 	Namespace string `json:"namespace,omitempty"`
 	// The docker image configuration to use for the STF services.
 	STFImage *STFImage `json:"stfImage,omitempty"`
-	// ADB extra configuration options
+	// ADB global configuration options - can be overridden on the device group level
 	ADB *ADBConfig `json:"adb,omitempty"`
 	// API extra configuration options
 	API *APIConfig `json:"api,omitempty"`
@@ -138,7 +140,7 @@ type STFConfig struct {
 	Auth *AuthConfig `json:"auth,omitempty"`
 	// Processor configuration options
 	Processor *ProcessorConfig `json:"processor,omitempty"`
-	// Provider configuration options
+	// Provider global configuration options - can be overridden on the device group level
 	Provider *GlobalProviderConfig `json:"provider,omitempty"`
 	// Reaper configuration options
 	Reaper *ReaperConfig `json:"reaper,omitempty"`

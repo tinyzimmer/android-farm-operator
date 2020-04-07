@@ -705,6 +705,11 @@ func (in *DeviceGroup) DeepCopyInto(out *DeviceGroup) {
 		*out = new(ProviderConfig)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ADB != nil {
+		in, out := &in.ADB, &out.ADB
+		*out = new(ADBConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Emulators != nil {
 		in, out := &in.Emulators, &out.Emulators
 		*out = new(EmulatorConfig)
