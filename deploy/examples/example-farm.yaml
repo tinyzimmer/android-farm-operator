@@ -101,7 +101,6 @@ spec:
       # configured above.
       provider:
         startPort: 16000
-        clusterLocalADB: true
       # Use the host USB device on `kind-worker` for this group
       hostUSB:
         nodeName: kind-worker
