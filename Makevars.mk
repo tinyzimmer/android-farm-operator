@@ -38,7 +38,6 @@ OPERATOR_SDK_URL ?= https://github.com/operator-framework/operator-sdk/releases/
 KIND ?= _bin/kind
 KIND_VERSION ?= v0.7.0
 KIND_DOWNLOAD_URL ?= https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(shell uname)-amd64
-CLUSTER_NAME ?= multitenancy
 KUBERNETES_VERSION ?= v1.18.0
 METALLB_VERSION ?= v0.9.3
 HELM_ARGS ?= --set operator.api.enabled=false

@@ -148,11 +148,6 @@ test-certmanager:
 	kubectl --context kind-kind wait pod -l app=webhook -n cert-manager --for=condition=Ready
 	echo "$$SELF_SIGNER" | kubectl apply --context kind-kind -f -
 
-# # Deploys a stand alone traefik into the cluster
-# traefik:
-# 	helm repo add traefik https://containous.github.io/traefik-helm-chart
-# 	helm repo update
-# 	helm upgrade --install --namespace ingress traefik traefik/traefik
 
 # Builds and deploys the operator into a local kind cluster, requires helm.
 .PHONY: deploy
